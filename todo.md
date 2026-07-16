@@ -34,12 +34,26 @@
 - [x] Base template con Tailwind CSS + HTMX
 - [x] Login/Logout con Django auth
 - [x] Dashboard con stats
-- [x] Página de Turnos (Lista + Crear + Cancelar + Detalle + Editar + Confirmar)
+- [x] Página de Turnos (Lista + Crear + Detalle + Editar + Confirmar + Cancelar + Filtros)
 - [x] Página de Clientes (Lista + Crear)
 - [x] Página de Servicios (Lista + Crear)
 - [x] Página de Staff (Lista + Crear usuario + staff juntos)
+- [x] Configuración del Negocio (nombre, teléfono, email, dirección, zona horaria)
 - [x] Mensajes de error amigables en español
-- [x] Nav menu: Dashboard | Turnos | Clientes | Servicios | Personal | Admin
+- [x] Nav menu responsive con hamburger en mobile
+- [x] Tablas responsive con scroll horizontal en mobile
+- [x] Filtros de turnos por estado (Todos, Pendientes, Confirmados, Completados, Cancelados)
+- [x] Menú hamburguesa para mobile (overlay en vez de empujar contenido)
+
+### WhatsApp Integration
+- [x] Configuración de tokens en negocio (phone_number_id, verify_token, access_token)
+- [x] Webhook receiver para recibir mensajes de Meta
+- [x] Conversation flow completo para booking:
+  - Saludo → Lista de servicios → Selección de staff → Fecha → Hora → Confirmación
+  - Crea turno real en base de datos al confirmar
+  - Manejo de errores (horario no disponible, sin staff, fecha inválida)
+- [ ] Conectar con WhatsApp Business API real (pendiente: comprar chip)
+- [ ] Registrar webhook en Meta Business Console
 
 ### Commits
 ```
@@ -57,6 +71,15 @@
 - fix(appointments): add csrf token to confirm button
 - fix(appointments): correct htmx event syntax and swap strategy
 - feat(appointments): add edit appointment functionality
+- feat(appointments): add status filters to appointments list
+- feat(business): add business settings page
+- fix: hide Admin link for non-superuser business users
+- feat: add mobile hamburger menu for navigation
+- fix: make mobile menu overlay content instead of pushing down
+- fix: make tables responsive on mobile with overflow-x-auto
+- fix: make filter buttons scroll horizontally on mobile
+- feat(whatsapp): add WhatsApp configuration to business settings
+- feat(whatsapp): implement full booking conversation flow
 ```
 
 ---
@@ -67,19 +90,22 @@
 - [x] Detalle de Turno (ver info completa)
 - [x] Confirmar turno (cambiar estado)
 - [x] Editar Turno (modificar datos)
-- [ ] Filtros funcionales en lista de turnos (pendientes, confirmados)
-- [ ] Página de Configuración del negocio
+- [x] Filtros funcionales en lista de turnos (pendientes, confirmados)
+- [x] Página de Configuración del negocio
+- [ ] Dashboard con gráficos/stats más detallados
+- [ ] Página de Conversations/Mensajes (ver historial WhatsApp)
 
 ### WhatsApp Integration
-- [ ] Conectar con WhatsApp Business API real
-- [ ] Configurar verify token y access token
-- [ ] Probar webhook con número real
+- [x] Configuración de tokens en negocio
+- [x] Conversation flow completo para booking
+- [ ] Probar webhook con número real (pendiente: comprar chip)
+- [ ] Registrar webhook URL en Meta Business Console
 
 ### Funcionalidades de Negocio
 - [ ] Onboarding flow para nuevos negocios
 - [ ] Gestión de planes y límites (Free, Basic, Pro)
-- [ ] Notificaciones por WhatsApp reales
-- [ ] Confirmación de turnos por mensaje
+- [ ] Notificaciones por email reales
+- [ ] Plantillas de mensajes de WhatsApp (templates aprobados por Meta)
 
 ### Deployment
 - [ ] Deploy a staging (Railway/Render/Fly.io)
@@ -136,10 +162,13 @@ dalebot/
 - **Clientes:** http://localhost:8000/customers/
 - **Servicios:** http://localhost:8000/services/
 - **Personal:** http://localhost:8000/staff/
+- **Config:** http://localhost:8000/settings/
 - **Repo:** https://github.com/marcusjgb/dalebot
 
 ---
 
 ## 🏃 Próximo Paso Recomendado
 
-Filtros en lista de turnos (pendientes/confirmados/completados) para facilitar la gestión diaria.
+1. **Probar WhatsApp** - Una vez que tengas el chip y configures los tokens en Meta
+2. **Dashboard stats** - Agregar gráficos de turnos por día/semana
+3. **Ver historial de conversaciones** - Página para ver las conversaciones de WhatsApp
