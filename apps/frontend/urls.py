@@ -8,6 +8,8 @@ from .views import (
     AppointmentsListView,
     AppointmentUpdateView,
     BusinessSettingsView,
+    ConversationDetailView,
+    ConversationsListView,
     CustomerCreateView,
     CustomersListView,
     DashboardView,
@@ -93,5 +95,15 @@ urlpatterns = [
         "settings/",
         BusinessSettingsView.as_view(),
         name="business_settings",
+    ),
+    path(
+        "conversations/",
+        ConversationsListView.as_view(),
+        name="conversations_list",
+    ),
+    path(
+        "conversations/<uuid:conversation_id>/",
+        ConversationDetailView.as_view(),
+        name="conversations_detail",
     ),
 ]

@@ -28,6 +28,7 @@
                     <a href="{% url 'customers_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Clientes</a>
                     <a href="{% url 'services_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Servicios</a>
                     <a href="{% url 'staff_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Personal</a>
+                    <a href="{% url 'conversations_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">WhatsApp</a>
                     <a href="{% url 'business_settings' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Config</a>
                     {% if user.is_superuser %}
                     <a href="{% url 'admin:index' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Admin</a>
@@ -59,6 +60,7 @@
                 <a href="{% url 'customers_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Clientes</a>
                 <a href="{% url 'services_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Servicios</a>
                 <a href="{% url 'staff_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Personal</a>
+                <a href="{% url 'conversations_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">WhatsApp</a>
                 <a href="{% url 'business_settings' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Config</a>
                 {% if user.is_superuser %}
                 <a href="{% url 'admin:index' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Admin</a>

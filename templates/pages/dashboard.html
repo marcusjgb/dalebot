@@ -2,6 +2,10 @@
 
 {% block title %}Dashboard - DaleBot{% endblock %}
 
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
 {% block content %}
 <div class="space-y-6">
     <div class="flex justify-between items-center">
@@ -33,6 +37,15 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Turnos por día (últimos 7 días)</h2>
+            </div>
+            <div class="p-6">
+                <canvas id="appointmentsChart" height="120"></canvas>
+            </div>
+        </div>
+
         <div class="bg-white rounded-lg shadow">
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-lg font-medium text-gray-900">Próximos turnos</h2>
@@ -83,4 +96,39 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+    const daysData = {{ days_data|safe }};
+    const labels = daysData.map(d => d.date);
+    const data = daysData.map(d => d.count);
+
+    new Chart(document.getElementById('appointmentsChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Turnos',
+                data: data,
+                backgroundColor: 'rgba(79, 70, 229, 0.5)',
+                borderColor: 'rgba(79, 70, 229, 1)',
+                borderWidth: 1,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

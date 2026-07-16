@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Conversación - DaleBot{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <a href="{% url 'conversations_list' %}" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">{{ conversation.customer.name }}</h1>
+                <p class="text-sm text-gray-500">{{ conversation.customer.phone }}</p>
+            </div>
+        </div>
+        <span class="px-3 py-1 text-sm rounded-full
+            {% if conversation.status == 'active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+            {{ conversation.get_status_display }}
+        </span>
+    </div>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-gray-500">
+                    Estado: {{ conversation.state|default:"Inicio" }}
+                </span>
+                <span class="text-sm text-gray-500">
+                    Inicio: {{ conversation.created_at|date:"d/m/Y H:i" }}
+                </span>
+            </div>
+        </div>
+
+        <div class="px-4 py-4 max-h-[60vh] overflow-y-auto" id="messages-container">
+            {% for message in conversation.messages.all %}
+            <div class="mb-4 {% if message.direction == 'inbound' %}text-left{% else %}text-right{% endif %}">
+                <div class="inline-block max-w-[80%] rounded-lg px-4 py-2
+                    {% if message.direction == 'inbound' %}
+                    bg-gray-100 text-gray-900
+                    {% else %}
+                    bg-indigo-600 text-white
+                    {% endif %}">
+                    <p class="text-sm">{{ message.content }}</p>
+                    <p class="text-xs mt-1 opacity-70">
+                        {{ message.timestamp|date:"H:i" }}
+                    </p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-8 text-gray-500">
+                <p>No hay mensajes en esta conversación</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if conversation.context_data %}
+        <div class="px-4 py-3 border-t border-gray-200 bg-gray-50">
+            <p class="text-xs text-gray-500 mb-2">Datos del booking:</p>
+            <div class="flex flex-wrap gap-2">
+                {% if conversation.context_data.service_name %}
+                <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
+                    {{ conversation.context_data.service_name }}
+                </span>
+                {% endif %}
+                {% if conversation.context_data.date_display %}
+                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                    📅 {{ conversation.context_data.date_display }}
+                </span>
+                {% endif %}
+                {% if conversation.context_data.time %}
+                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                    🕐 {{ conversation.context_data.time }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const container = document.getElementById('messages-container');
+    container.scrollTop = container.scrollHeight;
+</script>
+{% endblock %}

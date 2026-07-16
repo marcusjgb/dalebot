@@ -16,6 +16,7 @@ from apps.appointments.services import (
     update_appointment,
 )
 from apps.businesses.services import update_business
+from apps.conversations.models import Conversation
 from apps.customers.models import Customer
 from apps.customers.services import create_customer
 from apps.services.models import Service
@@ -91,6 +92,18 @@ class DashboardView(LoginRequiredMixin, View):
         services_count = Service.objects.filter(business=business, is_active=True).count()
         staff_count = Staff.objects.filter(business=business, is_active=True).count()
 
+        days_data = []
+        for i in range(6, -1, -1):
+            day = today - timedelta(days=i)
+            count = Appointment.objects.filter(
+                business=business,
+                starts_at__date=day,
+            ).count()
+            days_data.append({
+                "date": day.strftime("%d/%m"),
+                "count": count,
+            })
+
         context = {
             "stats": {
                 "appointments_today": appointments_today,
@@ -103,6 +116,7 @@ class DashboardView(LoginRequiredMixin, View):
             "services_count": services_count,
             "customers_count": customers_count,
             "appointments_month": appointments_month,
+            "days_data": days_data,
         }
         return render(request, "pages/dashboard.html", context)
 
@@ -676,3 +690,36 @@ class BusinessSettingsView(LoginRequiredMixin, View):
                 f"Error al guardar: {e}"
                 f"</div>"
             )
+
+
+class ConversationsListView(LoginRequiredMixin, View):
+    def get(self, request):
+        business = request.user.business
+        if not business:
+            return redirect("dashboard")
+
+        conversations = Conversation.objects.filter(
+            business=business
+        ).select_related("customer").prefetch_related("messages")[:50]
+
+        return render(
+            request,
+            "pages/conversations_list.html",
+            {"conversations": conversations},
+        )
+
+
+class ConversationDetailView(LoginRequiredMixin, View):
+    def get(self, request, conversation_id):
+        business = request.user.business
+        try:
+            conversation = Conversation.objects.select_related(
+                "customer"
+            ).prefetch_related("messages").get(id=conversation_id, business=business)
+            return render(
+                request,
+                "pages/conversation_detail.html",
+                {"conversation": conversation},
+            )
+        except Conversation.DoesNotExist:
+            return redirect("conversations_list")
