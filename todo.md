@@ -44,6 +44,8 @@
 - [x] Tablas responsive con scroll horizontal en mobile
 - [x] Filtros de turnos por estado (Todos, Pendientes, Confirmados, Completados, Cancelados)
 - [x] Menú hamburguesa para mobile (overlay en vez de empujar contenido)
+- [x] Dashboard con gráfico de turnos por día (Chart.js)
+- [x] Página de Conversaciones de WhatsApp (historial de mensajes)
 
 ### WhatsApp Integration
 - [x] Configuración de tokens en negocio (phone_number_id, verify_token, access_token)
@@ -80,6 +82,7 @@
 - fix: make filter buttons scroll horizontally on mobile
 - feat(whatsapp): add WhatsApp configuration to business settings
 - feat(whatsapp): implement full booking conversation flow
+- feat(frontend): add WhatsApp conversations page and dashboard stats chart
 ```
 
 ---
@@ -92,8 +95,8 @@
 - [x] Editar Turno (modificar datos)
 - [x] Filtros funcionales en lista de turnos (pendientes, confirmados)
 - [x] Página de Configuración del negocio
-- [ ] Dashboard con gráficos/stats más detallados
-- [ ] Página de Conversations/Mensajes (ver historial WhatsApp)
+- [x] Dashboard con gráficos/stats más detallados
+- [x] Página de Conversations/Mensajes (ver historial WhatsApp)
 
 ### WhatsApp Integration
 - [x] Configuración de tokens en negocio
