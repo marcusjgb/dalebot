@@ -6,42 +6,42 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
-            <a href="{% url 'conversations_list' %}" class="text-gray-400 hover:text-gray-600">
+            <a href="{% url 'conversations_list' %}" class="w-10 h-10 rounded-xl flex items-center justify-center text-argen-400 hover:text-argen-600 hover:bg-argen-50 transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
             </a>
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">{{ conversation.customer.name }}</h1>
-                <p class="text-sm text-gray-500">{{ conversation.customer.phone }}</p>
+                <h1 class="text-2xl font-display font-bold text-argen-800">{{ conversation.customer.name }}</h1>
+                <p class="text-sm text-argen-500">{{ conversation.customer.phone }}</p>
             </div>
         </div>
         <span class="px-3 py-1 text-sm rounded-full
-            {% if conversation.status == 'active' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+            {% if conversation.status == 'active' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-argen-50 text-argen-600 border border-argen-200{% endif %}">
             {{ conversation.get_status_display }}
         </span>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+    <div class="bg-white rounded-xl shadow-soft border border-argen-100 overflow-hidden">
+        <div class="px-5 py-3 border-b border-argen-100 bg-gradient-to-r from-argen-50 to-white">
             <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-500">
+                <span class="text-sm text-argen-600">
                     Estado: {{ conversation.state|default:"Inicio" }}
                 </span>
-                <span class="text-sm text-gray-500">
+                <span class="text-sm text-argen-500">
                     Inicio: {{ conversation.created_at|date:"d/m/Y H:i" }}
                 </span>
             </div>
         </div>
 
-        <div class="px-4 py-4 max-h-[60vh] overflow-y-auto" id="messages-container">
+        <div class="px-4 py-4 max-h-[60vh] overflow-y-auto bg-argen-50/30" id="messages-container">
             {% for message in conversation.messages.all %}
             <div class="mb-4 {% if message.direction == 'inbound' %}text-left{% else %}text-right{% endif %}">
-                <div class="inline-block max-w-[80%] rounded-lg px-4 py-2
+                <div class="inline-block max-w-[80%] rounded-2xl px-4 py-3
                     {% if message.direction == 'inbound' %}
-                    bg-gray-100 text-gray-900
+                    bg-white text-argen-800 shadow-soft border border-argen-100
                     {% else %}
-                    bg-indigo-600 text-white
+                    bg-gradient-to-br from-argen-500 to-argen-600 text-white shadow-lg
                     {% endif %}">
                     <p class="text-sm">{{ message.content }}</p>
                     <p class="text-xs mt-1 opacity-70">
@@ -50,28 +50,28 @@
                 </div>
             </div>
             {% empty %}
-            <div class="text-center py-8 text-gray-500">
+            <div class="text-center py-8 text-argen-400">
                 <p>No hay mensajes en esta conversación</p>
             </div>
             {% endfor %}
         </div>
 
         {% if conversation.context_data %}
-        <div class="px-4 py-3 border-t border-gray-200 bg-gray-50">
-            <p class="text-xs text-gray-500 mb-2">Datos del booking:</p>
+        <div class="px-5 py-3 border-t border-argen-100 bg-argen-50">
+            <p class="text-xs text-argen-500 mb-2 font-medium">Datos del booking:</p>
             <div class="flex flex-wrap gap-2">
                 {% if conversation.context_data.service_name %}
-                <span class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-800">
+                <span class="px-3 py-1 text-xs rounded-full bg-argen-100 text-argen-700 border border-argen-200">
                     {{ conversation.context_data.service_name }}
                 </span>
                 {% endif %}
                 {% if conversation.context_data.date_display %}
-                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                <span class="px-3 py-1 text-xs rounded-full bg-green-50 text-green-700 border border-green-200">
                     📅 {{ conversation.context_data.date_display }}
                 </span>
                 {% endif %}
                 {% if conversation.context_data.time %}
-                <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                <span class="px-3 py-1 text-xs rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                     🕐 {{ conversation.context_data.time }}
                 </span>
                 {% endif %}

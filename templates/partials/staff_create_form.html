@@ -1,12 +1,12 @@
-<div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40"
+<div id="modal-backdrop" class="fixed inset-0 bg-argen-900/60 backdrop-blur-sm z-40"
      hx-on:click="this.nextElementSibling.remove(); this.remove()"></div>
-<div id="modal" class="fixed inset-0 z-50 flex items-center justify-center">
-    <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h3 class="text-lg font-medium text-gray-900">Nuevo Personal</h3>
+<div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-lifted max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-5 border-b border-argen-100 flex justify-between items-center bg-gradient-to-r from-argen-50 to-white">
+            <h3 class="text-lg font-display font-semibold text-argen-800">Nuevo Personal</h3>
             <button hx-on:click="this.closest('#modal').remove(); document.getElementById('modal-backdrop').remove()"
-                    class="text-gray-400 hover:text-gray-600">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-argen-400 hover:text-argen-600 hover:bg-argen-100 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
@@ -17,67 +17,67 @@
               class="p-6 space-y-4">
             {% csrf_token %}
 
-            <div class="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
-                <p class="text-sm text-blue-700">Se creará un nuevo usuario y se vinculará como personal.</p>
+            <div class="bg-argen-50 border border-argen-200 rounded-xl p-3">
+                <p class="text-sm text-argen-700">Se creará un nuevo usuario y se vinculará como personal.</p>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label for="username" class="block text-sm font-medium text-gray-700">Usuario *</label>
+                    <label for="username" class="block text-sm font-medium text-argen-700 mb-1.5">Usuario *</label>
                     <input type="text" name="username" id="username" required
-                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                           class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
                 </div>
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email *</label>
+                    <label for="email" class="block text-sm font-medium text-argen-700 mb-1.5">Email *</label>
                     <input type="email" name="email" id="email" required
-                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                           class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label for="first_name" class="block text-sm font-medium text-gray-700">Nombre</label>
+                    <label for="first_name" class="block text-sm font-medium text-argen-700 mb-1.5">Nombre</label>
                     <input type="text" name="first_name" id="first_name"
-                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                           class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
                 </div>
                 <div>
-                    <label for="last_name" class="block text-sm font-medium text-gray-700">Apellido</label>
+                    <label for="last_name" class="block text-sm font-medium text-argen-700 mb-1.5">Apellido</label>
                     <input type="text" name="last_name" id="last_name"
-                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                           class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
                 </div>
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña *</label>
+                <label for="password" class="block text-sm font-medium text-argen-700 mb-1.5">Contraseña *</label>
                 <input type="password" name="password" id="password" required
-                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                <p class="mt-1 text-xs text-gray-500">Mínimo 8 caracteres.</p>
+                       class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
+                <p class="mt-1.5 text-xs text-argen-500">Mínimo 8 caracteres.</p>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Servicios</label>
-                <div class="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-md p-2">
+                <label class="block text-sm font-medium text-argen-700 mb-2">Servicios</label>
+                <div class="space-y-2 max-h-40 overflow-y-auto border border-argen-200 rounded-xl p-3 bg-argen-50">
                     {% for service in services %}
-                    <label class="flex items-center">
+                    <label class="flex items-center gap-2">
                         <input type="checkbox" name="service_ids" value="{{ service.id }}"
-                               class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-                        <span class="ml-2 text-sm text-gray-700">{{ service.name }}</span>
+                               class="w-4 h-4 text-argen-600 border-argen-300 rounded focus:ring-argen-500">
+                        <span class="text-sm text-argen-700">{{ service.name }}</span>
                     </label>
                     {% empty %}
-                    <p class="text-sm text-gray-500">No hay servicios disponibles</p>
+                    <p class="text-sm text-argen-500">No hay servicios disponibles</p>
                     {% endfor %}
                 </div>
             </div>
 
             <div id="form-result"></div>
 
-            <div class="flex justify-end space-x-3 pt-4">
+            <div class="flex justify-end gap-3 pt-4">
                 <button type="button" onclick="document.getElementById('modal').remove(); document.getElementById('modal-backdrop').remove()"
-                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        class="px-5 py-2.5 border border-argen-200 rounded-xl text-sm font-medium text-argen-700 hover:bg-argen-50 transition-colors">
                     Cancelar
                 </button>
                 <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        class="btn-primary px-5 py-2.5 text-white rounded-xl text-sm font-medium">
                     Crear personal
                 </button>
             </div>

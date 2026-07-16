@@ -2,35 +2,48 @@
 
 {% block title %}Iniciar sesión - DaleBot{% endblock %}
 
+{% block extra_head %}
+<style>
+    body {
+        background: linear-gradient(135deg, #f0f7ff 0%, #e0f0fe 50%, #fff8f0 100%);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
-        <div>
-            <h1 class="text-center text-3xl font-bold text-indigo-600">DaleBot</h1>
-            <h2 class="mt-6 text-center text-2xl font-bold text-gray-900">Iniciar sesión</h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
+        <div class="text-center">
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-argen-400 to-argen-600 flex items-center justify-center shadow-xl shadow-argen-500/30 mb-4">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+            <h1 class="text-center text-4xl font-display font-bold text-argen-800">DaleBot</h1>
+            <h2 class="mt-6 text-center text-2xl font-display font-bold text-argen-800">Iniciar sesión</h2>
+            <p class="mt-2 text-center text-sm text-argen-500">
                 Sistema de turnos por WhatsApp
             </p>
         </div>
         <form class="mt-8 space-y-6" action="{% url 'login' %}" method="POST">
             {% csrf_token %}
-            <div class="rounded-md shadow-sm space-y-4">
+            <div class="space-y-4">
                 <div>
-                    <label for="id_username" class="block text-sm font-medium text-gray-700">Usuario</label>
+                    <label for="id_username" class="block text-sm font-medium text-argen-700 mb-1.5">Usuario</label>
                     <input type="text" name="username" id="id_username" required
-                           class="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                           class="w-full border border-argen-200 rounded-xl py-3 px-4 text-argen-800 placeholder-argen-400 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all bg-white shadow-soft"
                            placeholder="Tu usuario">
                 </div>
                 <div>
-                    <label for="id_password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                    <label for="id_password" class="block text-sm font-medium text-argen-700 mb-1.5">Contraseña</label>
                     <input type="password" name="password" id="id_password" required
-                           class="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                           class="w-full border border-argen-200 rounded-xl py-3 px-4 text-argen-800 placeholder-argen-400 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all bg-white shadow-soft"
                            placeholder="Tu contraseña">
                 </div>
             </div>
 
             {% if form.errors %}
-            <div class="rounded-md bg-red-50 p-4">
+            <div class="rounded-xl bg-red-50 border border-red-200 p-4">
                 <div class="text-sm text-red-700">
                     Usuario o contraseña incorrectos.
                 </div>
@@ -38,7 +51,7 @@
             {% endif %}
 
             <button type="submit"
-                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    class="btn-primary w-full flex justify-center py-3 px-4 rounded-xl text-white font-semibold shadow-lg shadow-accent-500/30">
                 Iniciar sesión
             </button>
         </form>
