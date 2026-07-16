@@ -29,7 +29,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["apps*", "config*"]
+namespaces = false
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.test"
