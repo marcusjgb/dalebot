@@ -13,7 +13,8 @@
         </div>
         <form hx-post="{% url 'appointments_edit' appointment.id %}"
               hx-target="#modal"
-              hx-swap="innerHTML"
+              hx-swap="none"
+              hx-on:htmx:after-request="if(event.detail.successful) { document.getElementById('modal').remove(); document.getElementById('modal-backdrop').remove(); window.location.reload(); }"
               class="p-6 space-y-4">
             {% csrf_token %}
             <div>
