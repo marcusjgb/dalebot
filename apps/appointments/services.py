@@ -187,6 +187,44 @@ def reschedule_appointment(appointment, new_starts_at, rescheduled_by):
 
 
 @transaction.atomic
+def update_appointment(appointment, user=None, customer=None, service=None, staff=None,
+                       starts_at=None, notes=None):
+    from .models import AppointmentStatus
+
+    if appointment.status not in [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED]:
+        raise AppointmentError(f"Cannot update appointment with status {appointment.status}")
+
+    changes = {}
+
+    if customer is not None and customer != appointment.customer:
+        changes["customer"] = {"old": str(appointment.customer), "new": str(customer)}
+        appointment.customer = customer
+
+    if service is not None and service != appointment.service:
+        changes["service"] = {"old": str(appointment.service), "new": str(service)}
+        appointment.service = service
+
+    if staff is not None and staff != appointment.staff:
+        changes["staff"] = {"old": str(appointment.staff), "new": str(staff)}
+        appointment.staff = staff
+
+    if starts_at is not None and starts_at != appointment.starts_at:
+        changes["starts_at"] = {"old": str(appointment.starts_at), "new": str(starts_at)}
+        appointment.starts_at = starts_at
+        appointment.ends_at = starts_at + timedelta(minutes=appointment.service.duration_minutes)
+
+    if notes is not None and notes != appointment.notes:
+        changes["notes"] = {"old": appointment.notes or "", "new": notes}
+        appointment.notes = notes
+
+    if changes:
+        appointment.save()
+        _log_audit(user, appointment.business, "update", appointment, changes)
+
+    return appointment
+
+
+@transaction.atomic
 def complete_appointment(appointment, user=None):
     from .models import AppointmentStatus
     if appointment.status != AppointmentStatus.CONFIRMED:

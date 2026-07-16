@@ -6,6 +6,7 @@ from .views import (
     AppointmentCreateView,
     AppointmentDetailView,
     AppointmentsListView,
+    AppointmentUpdateView,
     CustomerCreateView,
     CustomersListView,
     DashboardView,
@@ -51,6 +52,11 @@ urlpatterns = [
         "appointments/<uuid:appointment_id>/",
         AppointmentDetailView.as_view(),
         name="appointments_detail",
+    ),
+    path(
+        "appointments/<uuid:appointment_id>/edit/",
+        AppointmentUpdateView.as_view(),
+        name="appointments_edit",
     ),
     path(
         "customers/",

@@ -9,7 +9,12 @@ from django.views import View
 
 from apps.accounts.services import create_user as create_user_account
 from apps.appointments.models import Appointment, AppointmentStatus
-from apps.appointments.services import cancel_appointment, confirm_appointment, create_appointment
+from apps.appointments.services import (
+    cancel_appointment,
+    confirm_appointment,
+    create_appointment,
+    update_appointment,
+)
 from apps.customers.models import Customer
 from apps.customers.services import create_customer
 from apps.services.models import Service
@@ -269,6 +274,85 @@ class AppointmentConfirmView(LoginRequiredMixin, View):
                 "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
                 f"Error al confirmar: {e}"
                 "</div>"
+            )
+
+
+class AppointmentUpdateView(LoginRequiredMixin, View):
+    def get(self, request, appointment_id):
+        business = request.user.business
+        try:
+            appointment = Appointment.objects.select_related(
+                "customer", "service", "staff", "staff__user"
+            ).get(id=appointment_id, business=business)
+            customers = Customer.objects.filter(business=business, is_active=True)
+            services = Service.objects.filter(business=business, is_active=True)
+            staff_members = Staff.objects.filter(business=business, is_active=True)
+            return render(
+                request,
+                "partials/appointment_edit_form.html",
+                {
+                    "appointment": appointment,
+                    "customers": customers,
+                    "services": services,
+                    "staff_members": staff_members,
+                },
+            )
+        except Appointment.DoesNotExist:
+            return HttpResponse(
+                "<div class='p-6 text-center text-red-600'>Turno no encontrado.</div>"
+            )
+
+    def post(self, request, appointment_id):
+        business = request.user.business
+        try:
+            appointment = Appointment.objects.get(id=appointment_id, business=business)
+            customer_id = request.POST.get("customer_id")
+            service_id = request.POST.get("service_id")
+            staff_id = request.POST.get("staff_id")
+            date = request.POST.get("date")
+            time = request.POST.get("time")
+            notes = request.POST.get("notes", "")
+
+            from datetime import datetime
+            starts_at = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+            starts_at = timezone.make_aware(starts_at)
+
+            customer = Customer.objects.get(id=customer_id)
+            service = Service.objects.get(id=service_id)
+            staff = Staff.objects.get(id=staff_id)
+
+            update_appointment(
+                appointment,
+                user=request.user,
+                customer=customer,
+                service=service,
+                staff=staff,
+                starts_at=starts_at,
+                notes=notes,
+            )
+            return HttpResponse("OK")
+        except Exception as e:
+            error_msg = str(e)
+            if "Slot not available" in error_msg:
+                user_msg = (
+                    "El personal no tiene disponibilidad en ese horario. "
+                    "Por favor elegí otro horario o fecha."
+                )
+            elif "already has an appointment" in error_msg:
+                user_msg = (
+                    "El personal ya tiene un turno en ese horario. "
+                    "Por favor elegí otro horario."
+                )
+            elif "not assigned to service" in error_msg:
+                user_msg = "El personal seleccionado no está asignado a este servicio."
+            elif "Cannot update" in error_msg:
+                user_msg = f"No se puede actualizar el turno. {error_msg}"
+            else:
+                user_msg = f"No se pudo actualizar el turno. {error_msg}"
+            return HttpResponse(
+                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"{user_msg}"
+                f"</div>"
             )
 
 
