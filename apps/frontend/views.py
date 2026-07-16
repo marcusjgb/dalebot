@@ -186,10 +186,25 @@ class AppointmentCreateView(LoginRequiredMixin, View):
                 starts_at=starts_at,
             )
             return HttpResponse(
-                "<script>window.location.reload()</script>"
+                "<script>"
+                "document.getElementById('modal').remove();"
+                "document.getElementById('modal-backdrop').remove();"
+                "window.location.reload();"
+                "</script>"
             )
         except Exception as e:
-            return HttpResponse(f"<div class='text-red-600'>Error: {e}</div>")
+            error_msg = str(e)
+            if "Slot not available" in error_msg:
+                user_msg = "El personal no tiene disponibilidad en ese horario. Por favor elegí otro horario o fecha."
+            elif "already has an appointment" in error_msg:
+                user_msg = "El personal ya tiene un turno en ese horario. Por favor elegí otro horario."
+            elif "not assigned to service" in error_msg:
+                user_msg = "El personal seleccionado no está asignado a este servicio."
+            else:
+                user_msg = f"No se pudo crear el turno. {error_msg}"
+            return HttpResponse(
+                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>{user_msg}</div>"
+            )
 
 
 class AppointmentCancelView(LoginRequiredMixin, View):
@@ -207,4 +222,8 @@ class AppointmentCancelView(LoginRequiredMixin, View):
                 {"appointments": appointments},
             )
         except Exception as e:
-            return HttpResponse(f"<div class='text-red-600'>Error: {e}</div>")
+            return HttpResponse(
+                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"Error al cancelar: {e}"
+                f"</div>"
+            )
