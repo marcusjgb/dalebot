@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install ".[dev]"
-      - run: mypy apps/ --ignore-missing-imports
+      - run: mypy apps/ --ignore-missing-imports --explicit-package-bases
 
   test:
     runs-on: ubuntu-latest
