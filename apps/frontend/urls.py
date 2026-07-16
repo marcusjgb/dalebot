@@ -7,6 +7,7 @@ from .views import (
     AppointmentDetailView,
     AppointmentsListView,
     AppointmentUpdateView,
+    BusinessSettingsView,
     CustomerCreateView,
     CustomersListView,
     DashboardView,
@@ -87,5 +88,10 @@ urlpatterns = [
         "staff/create/",
         StaffCreateView.as_view(),
         name="staff_create",
+    ),
+    path(
+        "settings/",
+        BusinessSettingsView.as_view(),
+        name="business_settings",
     ),
 ]

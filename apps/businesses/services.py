@@ -24,7 +24,7 @@ def create_business(name, timezone="America/Argentina/Buenos_Aires"):
 
 @transaction.atomic
 def update_business(business, **kwargs):
-    allowed = ["name", "timezone", "is_active"]
+    allowed = ["name", "timezone", "is_active", "phone", "email", "address", "logo_url"]
     for key, value in kwargs.items():
         if key in allowed:
             setattr(business, key, value)

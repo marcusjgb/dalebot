@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Configuración - DaleBot{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Configuración del Negocio</h1>
+    </div>
+
+    <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Datos del negocio</h2>
+        </div>
+        <div class="p-6">
+            <form hx-post="{% url 'business_settings' %}"
+                  hx-target="#settings-result"
+                  hx-swap="innerHTML"
+                  class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nombre del negocio *</label>
+                    <input type="text" name="name" id="name" required
+                           value="{{ business.name }}"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono</label>
+                        <input type="text" name="phone" id="phone"
+                               value="{{ business.phone }}"
+                               placeholder="+54 11 1234-5678"
+                               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" name="email" id="email"
+                               value="{{ business.email }}"
+                               placeholder="contacto@negocio.com"
+                               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label for="address" class="block text-sm font-medium text-gray-700">Dirección</label>
+                    <input type="text" name="address" id="address"
+                           value="{{ business.address }}"
+                           placeholder="Calle 123, Ciudad"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="timezone" class="block text-sm font-medium text-gray-700">Zona horaria</label>
+                    <select name="timezone" id="timezone"
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="America/Argentina/Buenos_Aires" {% if business.timezone == "America/Argentina/Buenos_Aires" %}selected{% endif %}>Buenos Aires (UTC-3)</option>
+                        <option value="America/Argentina/Cordoba" {% if business.timezone == "America/Argentina/Cordoba" %}selected{% endif %}>Córdoba (UTC-3)</option>
+                        <option value="America/Mexico_City" {% if business.timezone == "America/Mexico_City" %}selected{% endif %}>Ciudad de México (UTC-6)</option>
+                        <option value="America/Bogota" {% if business.timezone == "America/Bogota" %}selected{% endif %}>Bogotá (UTC-5)</option>
+                        <option value="America/Lima" {% if business.timezone == "America/Lima" %}selected{% endif %}>Lima (UTC-5)</option>
+                        <option value="America/Santiago" {% if business.timezone == "America/Santiago" %}selected{% endif %}>Santiago (UTC-4)</option>
+                        <option value="America/New_York" {% if business.timezone == "America/New_York" %}selected{% endif %}>Nueva York (UTC-5)</option>
+                        <option value="Europe/Madrid" {% if business.timezone == "Europe/Madrid" %}selected{% endif %}>Madrid (UTC+1)</option>
+                        <option value="Europe/London" {% if business.timezone == "Europe/London" %}selected{% endif %}>Londres (UTC+0)</option>
+                    </select>
+                </div>
+                <div id="settings-result"></div>
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Información de la cuenta</h2>
+        </div>
+        <div class="p-6">
+            <dl class="grid grid-cols-2 gap-4">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Slug</dt>
+                    <dd class="text-sm text-gray-900">{{ business.slug }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Estado</dt>
+                    <dd class="text-sm text-gray-900">
+                        {% if business.is_active %}
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
+                        {% else %}
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Inactivo</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Creado</dt>
+                    <dd class="text-sm text-gray-900">{{ business.created_at|date:"d/m/Y" }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -15,6 +15,7 @@ from apps.appointments.services import (
     create_appointment,
     update_appointment,
 )
+from apps.businesses.services import update_business
 from apps.customers.models import Customer
 from apps.customers.services import create_customer
 from apps.services.models import Service
@@ -617,4 +618,53 @@ class StaffCreateView(LoginRequiredMixin, View):
                 "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
                 f"No se pudo crear el personal. {e}"
                 "</div>"
+            )
+
+
+class BusinessSettingsView(LoginRequiredMixin, View):
+    def get(self, request):
+        business = request.user.business
+        if not business:
+            return redirect("dashboard")
+
+        return render(request, "pages/business_settings.html", {"business": business})
+
+    def post(self, request):
+        business = request.user.business
+        if not business:
+            return redirect("dashboard")
+
+        name = request.POST.get("name", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        email = request.POST.get("email", "").strip()
+        address = request.POST.get("address", "").strip()
+        timezone_val = request.POST.get("timezone", "America/Argentina/Buenos_Aires").strip()
+
+        if not name:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                "El nombre del negocio es obligatorio."
+                "</div>"
+            )
+
+        try:
+            update_business(
+                business,
+                name=name,
+                phone=phone,
+                email=email,
+                address=address,
+                timezone=timezone_val,
+            )
+            return HttpResponse(
+                "<div class='bg-green-50 border border-green-200 rounded-md "
+                "p-3 text-sm text-green-700'>"
+                "Configuración guardada correctamente."
+                "</div>"
+            )
+        except Exception as e:
+            return HttpResponse(
+                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"Error al guardar: {e}"
+                f"</div>"
             )
