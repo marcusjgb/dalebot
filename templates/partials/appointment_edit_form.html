@@ -60,7 +60,7 @@
                 <div id="time-slots-message-edit" class="text-sm text-argen-500 py-2">
                     Seleccioná una fecha para ver los horarios disponibles
                 </div>
-                <div id="time-slots-edit" class="grid grid-cols-4 gap-2 hidden"></div>
+                <div id="time-slots-edit" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 hidden"></div>
                 <input type="hidden" name="time" id="selected_time_edit" required value="{{ appointment.starts_at|time:'H:i' }}">
             </div>
             <div>
