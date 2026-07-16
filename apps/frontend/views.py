@@ -230,13 +230,7 @@ class AppointmentCancelView(LoginRequiredMixin, View):
         try:
             appointment = Appointment.objects.get(id=appointment_id, business=business)
             cancel_appointment(appointment, request.user)
-            return HttpResponse(
-                "<script>"
-                "document.getElementById('modal').remove();"
-                "document.getElementById('modal-backdrop').remove();"
-                "window.location.reload();"
-                "</script>"
-            )
+            return HttpResponse("OK")
         except Exception as e:
             return HttpResponse(
                 "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
@@ -269,13 +263,7 @@ class AppointmentConfirmView(LoginRequiredMixin, View):
         try:
             appointment = Appointment.objects.get(id=appointment_id, business=business)
             confirm_appointment(appointment)
-            return HttpResponse(
-                "<script>"
-                "document.getElementById('modal').remove();"
-                "document.getElementById('modal-backdrop').remove();"
-                "window.location.reload();"
-                "</script>"
-            )
+            return HttpResponse("OK")
         except Exception as e:
             return HttpResponse(
                 "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
