@@ -1,0 +1,28 @@
+<div class="space-y-4">
+    <form hx-post="{% url 'staff_services' staff.id %}"
+          hx-target="#services-section"
+          hx-swap="innerHTML"
+          class="space-y-3">
+        {% csrf_token %}
+        <div class="flex items-center justify-between">
+            <h4 class="text-sm font-semibold text-argen-700">Editar servicios</h4>
+            <button type="submit"
+                    class="text-xs px-3 py-1.5 rounded-lg bg-argen-600 text-white hover:bg-argen-700 transition-colors">
+                Guardar
+            </button>
+        </div>
+        <div class="space-y-2 max-h-48 overflow-y-auto border border-argen-200 rounded-xl p-3 bg-argen-50">
+            {% for service in services %}
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="service_ids" value="{{ service.id }}"
+                       {% if service.id in staff_service_ids %}checked{% endif %}
+                       class="w-4 h-4 text-argen-600 border-argen-300 rounded focus:ring-argen-500">
+                <span class="text-sm text-argen-700">{{ service.name }}</span>
+            </label>
+            {% empty %}
+            <p class="text-sm text-argen-500">No hay servicios disponibles</p>
+            {% endfor %}
+        </div>
+    </form>
+    <div id="services-message"></div>
+</div>

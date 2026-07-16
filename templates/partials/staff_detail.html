@@ -1,0 +1,147 @@
+<div id="modal-backdrop" class="fixed inset-0 bg-argen-900/60 backdrop-blur-sm z-40"
+     hx-on:click="this.nextElementSibling.remove(); this.remove()"></div>
+<div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-lifted max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-5 border-b border-argen-100 flex justify-between items-center bg-gradient-to-r from-argen-50 to-white">
+            <h3 class="text-lg font-display font-semibold text-argen-800">
+                {{ staff.user.get_full_name|default:staff.user.username }}
+            </h3>
+            <button hx-on:click="this.closest('#modal').remove(); document.getElementById('modal-backdrop').remove()"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-argen-400 hover:text-argen-600 hover:bg-argen-100 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-6">
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="text-sm font-semibold text-argen-700">Servicios asignados</h4>
+                    <button hx-get="{% url 'staff_services' staff.id %}"
+                            hx-target="#services-section"
+                            hx-swap="innerHTML"
+                            class="text-xs px-3 py-1.5 rounded-lg bg-argen-100 text-argen-700 hover:bg-argen-200 transition-colors">
+                        Editar servicios
+                    </button>
+                </div>
+                <div id="services-section" class="flex flex-wrap gap-2">
+                    {% for service in staff.services.all %}
+                    <span class="px-3 py-1.5 text-sm rounded-xl bg-accent-50 text-accent-700 border border-accent-200">
+                        {{ service.name }}
+                    </span>
+                    {% empty %}
+                    <span class="text-sm text-argen-400 italic">Sin servicios asignados</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="text-sm font-semibold text-argen-700">Horarios disponibles</h4>
+                    <button hx-get="{% url 'staff_availability' staff.id %}"
+                            hx-target="#availability-section"
+                            hx-swap="innerHTML"
+                            class="text-xs px-3 py-1.5 rounded-lg bg-argen-100 text-argen-700 hover:bg-argen-200 transition-colors">
+                        Configurar horarios
+                    </button>
+                </div>
+                <div id="availability-section" class="space-y-2">
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-argen-600 w-24">Lunes</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for slot in slots_by_day.0 %}
+                            <span class="px-2.5 py-1 text-xs rounded-lg bg-argen-50 text-argen-700 border border-argen-200">
+                                {{ slot.start }} - {{ slot.end }}
+                            </span>
+                            {% empty %}
+                            <span class="text-xs text-argen-400 italic">Sin horarios</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-argen-600 w-24">Martes</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for slot in slots_by_day.1 %}
+                            <span class="px-2.5 py-1 text-xs rounded-lg bg-argen-50 text-argen-700 border border-argen-200">
+                                {{ slot.start }} - {{ slot.end }}
+                            </span>
+                            {% empty %}
+                            <span class="text-xs text-argen-400 italic">Sin horarios</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-argen-600 w-24">Miércoles</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for slot in slots_by_day.2 %}
+                            <span class="px-2.5 py-1 text-xs rounded-lg bg-argen-50 text-argen-700 border border-argen-200">
+                                {{ slot.start }} - {{ slot.end }}
+                            </span>
+                            {% empty %}
+                            <span class="text-xs text-argen-400 italic">Sin horarios</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-argen-600 w-24">Jueves</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for slot in slots_by_day.3 %}
+                            <span class="px-2.5 py-1 text-xs rounded-lg bg-argen-50 text-argen-700 border border-argen-200">
+                                {{ slot.start }} - {{ slot.end }}
+                            </span>
+                            {% empty %}
+                            <span class="text-xs text-argen-400 italic">Sin horarios</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-argen-600 w-24">Viernes</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for slot in slots_by_day.4 %}
+                            <span class="px-2.5 py-1 text-xs rounded-lg bg-argen-50 text-argen-700 border border-argen-200">
+                                {{ slot.start }} - {{ slot.end }}
+                            </span>
+                            {% empty %}
+                            <span class="text-xs text-argen-400 italic">Sin horarios</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-argen-600 w-24">Sábado</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for slot in slots_by_day.5 %}
+                            <span class="px-2.5 py-1 text-xs rounded-lg bg-argen-50 text-argen-700 border border-argen-200">
+                                {{ slot.start }} - {{ slot.end }}
+                            </span>
+                            {% empty %}
+                            <span class="text-xs text-argen-400 italic">Sin horarios</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-argen-600 w-24">Domingo</span>
+                        <div class="flex flex-wrap gap-1.5">
+                            {% for slot in slots_by_day.6 %}
+                            <span class="px-2.5 py-1 text-xs rounded-lg bg-argen-50 text-argen-700 border border-argen-200">
+                                {{ slot.start }} - {{ slot.end }}
+                            </span>
+                            {% empty %}
+                            <span class="text-xs text-argen-400 italic">Sin horarios</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-semibold text-argen-700 mb-2">Estado</h4>
+                {% if staff.is_active %}
+                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-50 text-green-700 border border-green-200">Activo</span>
+                {% else %}
+                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-argen-50 text-argen-600 border border-argen-200">Inactivo</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

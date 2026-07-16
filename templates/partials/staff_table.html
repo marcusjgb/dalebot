@@ -6,6 +6,7 @@
             <th class="px-5 py-4 text-left text-xs font-semibold text-argen-500 uppercase tracking-wider">Nombre</th>
             <th class="px-5 py-4 text-left text-xs font-semibold text-argen-500 uppercase tracking-wider">Servicios</th>
             <th class="px-5 py-4 text-left text-xs font-semibold text-argen-500 uppercase tracking-wider">Estado</th>
+            <th class="px-5 py-4 text-left text-xs font-semibold text-argen-500 uppercase tracking-wider">Acciones</th>
         </tr>
     </thead>
     <tbody class="divide-y divide-argen-100">
@@ -34,6 +35,14 @@
                 {% else %}
                 <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-argen-50 text-argen-600 border border-argen-200">Inactivo</span>
                 {% endif %}
+            </td>
+            <td class="px-5 py-4">
+                <button hx-get="{% url 'staff_detail' staff.id %}"
+                        hx-target="#modal-container"
+                        hx-swap="innerHTML"
+                        class="text-xs px-3 py-1.5 rounded-lg bg-argen-100 text-argen-700 hover:bg-argen-200 transition-colors">
+                    Gestionar
+                </button>
             </td>
         </tr>
         {% endfor %}

@@ -14,6 +14,7 @@
         <form hx-post="{% url 'appointments_create' %}"
               hx-target="#modal-result"
               hx-swap="innerHTML"
+              hx-on:htmx:after-request="if(event.detail.successful) { setTimeout(refreshSlots, 100); }"
               class="p-6 space-y-4">
             {% csrf_token %}
             {% if not customers or not services or not staff_members %}
@@ -109,6 +110,35 @@
         document.getElementById('selected_time').value = time;
     }
 
+    function refreshSlots() {
+        const date = document.getElementById('date').value;
+        const staffId = document.getElementById('staff').value;
+        const serviceId = document.getElementById('service').value;
+        const messageEl = document.getElementById('time-slots-message');
+        const slotsEl = document.getElementById('time-slots');
+
+        if (!date || !staffId || !serviceId) {
+            return;
+        }
+
+        messageEl.textContent = 'Cargando horarios...';
+        slotsEl.classList.add('hidden');
+
+        const url = `/appointments/available-slots/?date=${date}&staff_id=${staffId}&service_id=${serviceId}`;
+
+        fetch(url, { cache: 'no-cache' })
+            .then(response => response.text())
+            .then(html => {
+                slotsEl.innerHTML = html;
+                slotsEl.classList.remove('hidden');
+                messageEl.textContent = '';
+                document.getElementById('selected_time').value = '';
+            })
+            .catch(err => {
+                messageEl.textContent = 'Error al cargar horarios';
+            });
+    }
+
     document.getElementById('date').addEventListener('change', function() {
         const date = this.value;
         const staffId = document.getElementById('staff').value;
@@ -127,7 +157,7 @@
 
         const url = `/appointments/available-slots/?date=${date}&staff_id=${staffId}&service_id=${serviceId}`;
 
-        fetch(url)
+        fetch(url, { cache: 'no-cache' })
             .then(response => response.text())
             .then(html => {
                 slotsEl.innerHTML = html;
@@ -145,5 +175,11 @@
 
     document.getElementById('service').addEventListener('change', function() {
         document.getElementById('date').dispatchEvent(new Event('change'));
+    });
+
+    document.querySelector('form[hx-post]').addEventListener('htmx:after-request', function(event) {
+        if (event.detail.successful) {
+            refreshSlots();
+        }
     });
 </script>

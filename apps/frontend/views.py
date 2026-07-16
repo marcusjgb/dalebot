@@ -217,11 +217,25 @@ class AppointmentCreateView(LoginRequiredMixin, View):
         customer_id = request.POST.get("customer_id")
         service_id = request.POST.get("service_id")
         staff_id = request.POST.get("staff_id")
-        date = request.POST.get("date")
-        time = request.POST.get("time")
+        date = request.POST.get("date", "").strip()
+        time = request.POST.get("time", "").strip()
+
+        if not date or not time:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700'>"
+                "Tenés que seleccionar fecha y horario."
+                "</div>"
+            )
 
         from datetime import datetime
-        starts_at = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+        try:
+            starts_at = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+        except ValueError:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700'>"
+                "Formato de fecha u hora inválido."
+                "</div>"
+            )
         starts_at = timezone.make_aware(starts_at)
 
         if starts_at <= timezone.now():
@@ -323,15 +337,18 @@ class AvailableSlotsView(LoginRequiredMixin, View):
             status__in=[AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED],
         ).order_by("starts_at")
 
+        tz = timezone.get_current_timezone()
         busy_slots = []
         for apt in existing_appointments:
-            busy_slots.append((apt.starts_at.time(), apt.ends_at.time()))
+            busy_slots.append((
+                apt.starts_at.astimezone(tz).time(),
+                apt.ends_at.astimezone(tz).time()
+            ))
 
         available_times = []
 
         now = timezone.now()
         is_today = target_date == now.date()
-        tz = timezone.get_current_timezone()
 
         for slot in slots:
             slot_start = slot.start_time
@@ -382,7 +399,6 @@ class AvailableSlotsView(LoginRequiredMixin, View):
             </button>
             '''
         html += '</div>'
-        html += '<input type="hidden" name="time" id="selected_time" required>'
 
         return HttpResponse(html)
 
@@ -469,12 +485,28 @@ class AppointmentUpdateView(LoginRequiredMixin, View):
             customer_id = request.POST.get("customer_id")
             service_id = request.POST.get("service_id")
             staff_id = request.POST.get("staff_id")
-            date = request.POST.get("date")
-            time = request.POST.get("time")
+            date = request.POST.get("date", "").strip()
+            time = request.POST.get("time", "").strip()
             notes = request.POST.get("notes", "")
 
+            if not date or not time:
+                return HttpResponse(
+                    "<div class='bg-red-50 border border-red-200 rounded-xl "
+                    "p-4 text-sm text-red-700'>"
+                    "Tenés que seleccionar fecha y horario."
+                    "</div>"
+                )
+
             from datetime import datetime
-            starts_at = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+            try:
+                starts_at = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+            except ValueError:
+                return HttpResponse(
+                    "<div class='bg-red-50 border border-red-200 rounded-xl "
+                    "p-4 text-sm text-red-700'>"
+                    "Formato de fecha u hora inválido."
+                    "</div>"
+                )
             starts_at = timezone.make_aware(starts_at)
 
             if starts_at <= timezone.now():
@@ -766,6 +798,95 @@ class StaffCreateView(LoginRequiredMixin, View):
                 f"No se pudo crear el personal. {e}"
                 "</div>"
             )
+
+
+class StaffDetailView(LoginRequiredMixin, View):
+    def get(self, request, staff_id):
+        business = request.user.business
+        try:
+            staff = Staff.objects.get(id=staff_id, business=business)
+        except Staff.DoesNotExist:
+            return HttpResponse(
+                "<div class='p-6 text-center text-red-600'>Personal no encontrado.</div>"
+            )
+
+        from apps.availability.models import AvailabilitySlot
+        slots = AvailabilitySlot.objects.filter(
+            business=business,
+            staff=staff
+        ).order_by("day_of_week", "start_time")
+
+        days = [
+            (0, "Lunes"),
+            (1, "Martes"),
+            (2, "Miércoles"),
+            (3, "Jueves"),
+            (4, "Viernes"),
+            (5, "Sábado"),
+            (6, "Domingo"),
+        ]
+
+        slots_by_day = {i: [] for i in range(7)}
+        for slot in slots:
+            slots_by_day[slot.day_of_week].append({
+                "id": str(slot.id),
+                "start": slot.start_time.strftime("%H:%M"),
+                "end": slot.end_time.strftime("%H:%M"),
+            })
+
+        services = Service.objects.filter(business=business, is_active=True)
+        staff_service_ids = list(staff.services.values_list("id", flat=True))
+
+        return render(request, "partials/staff_detail.html", {
+            "staff": staff,
+            "services": services,
+            "staff_service_ids": staff_service_ids,
+            "slots_by_day": slots_by_day,
+            "days": days,
+        })
+
+
+class StaffServicesView(LoginRequiredMixin, View):
+    def get(self, request, staff_id):
+        business = request.user.business
+        try:
+            staff = Staff.objects.get(id=staff_id, business=business)
+        except Staff.DoesNotExist:
+            return HttpResponse(
+                "<div class='p-6 text-center text-red-600'>Personal no encontrado.</div>"
+            )
+
+        services = Service.objects.filter(business=business, is_active=True)
+        staff_service_ids = list(staff.services.values_list("id", flat=True))
+
+        return render(request, "partials/staff_services_form.html", {
+            "staff": staff,
+            "services": services,
+            "staff_service_ids": staff_service_ids,
+        })
+
+    def post(self, request, staff_id):
+        business = request.user.business
+        try:
+            staff = Staff.objects.get(id=staff_id, business=business)
+        except Staff.DoesNotExist:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700'>"
+                "Personal no encontrado."
+                "</div>"
+            )
+
+        service_ids = request.POST.getlist("service_ids")
+        service_ids = [s.strip() for s in service_ids if s.strip()]
+
+        staff.services.set(service_ids)
+
+        return HttpResponse(
+            "<div class='bg-green-50 border border-green-200 rounded-xl "
+            "p-4 text-sm text-green-700'>"
+            "Servicios actualizados correctamente."
+            "</div>"
+        )
 
 
 class StaffAvailabilityView(LoginRequiredMixin, View):

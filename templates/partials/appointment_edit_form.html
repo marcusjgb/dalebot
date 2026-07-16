@@ -99,6 +99,35 @@
         document.getElementById('selected_time_edit').value = time;
     }
 
+    function refreshSlotsEdit() {
+        const date = document.getElementById('date_edit').value;
+        const staffId = document.getElementById('staff_edit').value;
+        const serviceId = document.getElementById('service_edit').value;
+        const messageEl = document.getElementById('time-slots-message-edit');
+        const slotsEl = document.getElementById('time-slots-edit');
+
+        if (!date || !staffId || !serviceId) {
+            return;
+        }
+
+        messageEl.textContent = 'Cargando horarios...';
+        slotsEl.classList.add('hidden');
+
+        const url = `/appointments/available-slots/?date=${date}&staff_id=${staffId}&service_id=${serviceId}`;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                slotsEl.innerHTML = html;
+                slotsEl.classList.remove('hidden');
+                messageEl.textContent = '';
+                document.getElementById('selected_time_edit').value = '';
+            })
+            .catch(err => {
+                messageEl.textContent = 'Error al cargar horarios';
+            });
+    }
+
     document.getElementById('date_edit').addEventListener('change', function() {
         const date = this.value;
         const staffId = document.getElementById('staff_edit').value;
@@ -135,5 +164,11 @@
 
     document.getElementById('service_edit').addEventListener('change', function() {
         document.getElementById('date_edit').dispatchEvent(new Event('change'));
+    });
+
+    document.querySelector('form[hx-post]').addEventListener('htmx:after-request', function(event) {
+        if (event.detail.successful) {
+            refreshSlotsEdit();
+        }
     });
 </script>

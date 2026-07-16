@@ -46,6 +46,10 @@
 - [x] Menú hamburguesa para mobile (overlay en vez de empujar contenido)
 - [x] Dashboard con gráfico de turnos por día (Chart.js)
 - [x] Página de Conversaciones de WhatsApp (historial de mensajes)
+- [x] Gestión de staff: detalle, asignar/quitar servicios, configurar disponibilidad
+- [x] Slots de horarios disponibles se actualizan tras crear turno
+- [x] Fix timezone comparison en available-slots (UTC vs ART)
+- [x] Fix validation de fecha/hora vacía en creación de turnos
 
 ### WhatsApp Integration
 - [x] Configuración de tokens en negocio (phone_number_id, verify_token, access_token)
@@ -83,6 +87,13 @@
 - feat(whatsapp): add WhatsApp configuration to business settings
 - feat(whatsapp): implement full booking conversation flow
 - feat(frontend): add WhatsApp conversations page and dashboard stats chart
+- fix(appointments): timezone-aware datetime comparison in available_slots
+- fix(appointments): validate empty date/time fields in create appointment
+- fix(appointments): remove duplicate time hidden input causing validation errors
+- feat(appointments): refresh slots after creating appointment
+- feat(staff): add StaffDetailView and StaffServicesView for managing staff
+- fix(appointments): use astimezone for busy slots comparison (UTC to local)
+- feat(staff): add staff availability management modal
 ```
 
 ---
