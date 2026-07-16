@@ -20,28 +20,77 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <a href="{% url 'dashboard' %}" class="text-xl font-bold text-indigo-600">DaleBot</a>
-                    <div class="hidden sm:ml-8 sm:flex sm:space-x-4">
-                        <a href="{% url 'dashboard' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Dashboard</a>
-                        <a href="{% url 'appointments_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Turnos</a>
-                        <a href="{% url 'customers_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Clientes</a>
-                        <a href="{% url 'services_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Servicios</a>
-                        <a href="{% url 'staff_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Personal</a>
-                        <a href="{% url 'business_settings' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Config</a>
-                        {% if user.is_superuser %}
-                        <a href="{% url 'admin:index' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Admin</a>
-                        {% endif %}
-                    </div>
                 </div>
-                <div class="flex items-center space-x-4">
+
+                <div class="hidden sm:flex sm:items-center sm:space-x-4">
+                    <a href="{% url 'dashboard' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Dashboard</a>
+                    <a href="{% url 'appointments_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Turnos</a>
+                    <a href="{% url 'customers_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Clientes</a>
+                    <a href="{% url 'services_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Servicios</a>
+                    <a href="{% url 'staff_list' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Personal</a>
+                    <a href="{% url 'business_settings' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Config</a>
+                    {% if user.is_superuser %}
+                    <a href="{% url 'admin:index' %}" class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Admin</a>
+                    {% endif %}
                     <span class="text-sm text-gray-500">{{ user.business.name|default:"Sin negocio" }}</span>
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
                         <button type="submit" class="text-sm text-gray-500 hover:text-gray-700">Cerrar sesión</button>
                     </form>
                 </div>
+
+                <div class="flex items-center sm:hidden">
+                    <button id="mobile-menu-btn" type="button"
+                            class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                            aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden sm:hidden border-t border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Dashboard</a>
+                <a href="{% url 'appointments_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Turnos</a>
+                <a href="{% url 'customers_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Clientes</a>
+                <a href="{% url 'services_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Servicios</a>
+                <a href="{% url 'staff_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Personal</a>
+                <a href="{% url 'business_settings' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Config</a>
+                {% if user.is_superuser %}
+                <a href="{% url 'admin:index' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Admin</a>
+                {% endif %}
+            </div>
+            <div class="pt-4 pb-3 border-t border-gray-200">
+                <div class="px-2">
+                    <span class="block px-3 py-2 text-sm text-gray-500">{{ user.business.name|default:"Sin negocio" }}</span>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="block w-full text-left px-3 py-2 text-base font-medium text-gray-500 hover:text-gray-700">Cerrar sesión</button>
+                    </form>
+                </div>
             </div>
         </div>
     </nav>
+
+    <script>
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                menu.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    </script>
     {% endif %}
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
