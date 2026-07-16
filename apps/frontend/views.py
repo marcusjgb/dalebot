@@ -765,6 +765,148 @@ class StaffCreateView(LoginRequiredMixin, View):
             )
 
 
+class StaffAvailabilityView(LoginRequiredMixin, View):
+    def get(self, request, staff_id):
+        business = request.user.business
+        try:
+            staff = Staff.objects.get(id=staff_id, business=business)
+        except Staff.DoesNotExist:
+            return HttpResponse(
+                "<div class='p-6 text-center text-red-600'>Staff no encontrado.</div>"
+            )
+
+        from apps.availability.models import AvailabilitySlot
+        slots = AvailabilitySlot.objects.filter(
+            business=business,
+            staff=staff
+        ).order_by("day_of_week", "start_time")
+
+        slots_by_day = {i: [] for i in range(7)}
+        for slot in slots:
+            slots_by_day[slot.day_of_week].append({
+                "id": str(slot.id),
+                "start": slot.start_time.strftime("%H:%M"),
+                "end": slot.end_time.strftime("%H:%M"),
+            })
+
+        days = [
+            (0, "Lunes"),
+            (1, "Martes"),
+            (2, "Miércoles"),
+            (3, "Jueves"),
+            (4, "Viernes"),
+            (5, "Sábado"),
+            (6, "Domingo"),
+        ]
+
+        return render(request, "partials/staff_availability_form.html", {
+            "staff": staff,
+            "slots_by_day": slots_by_day,
+            "days": days,
+        })
+
+    def post(self, request, staff_id):
+        business = request.user.business
+        try:
+            staff = Staff.objects.get(id=staff_id, business=business)
+        except Staff.DoesNotExist:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700'>"
+                "Staff no encontrado."
+                "</div>"
+            )
+
+        action = request.POST.get("action")
+        from apps.availability.models import AvailabilitySlot
+        from apps.availability.services import (
+            create_availability_slot,
+            delete_availability_slot,
+        )
+
+        if action == "add":
+            day = int(request.POST.get("day"))
+            start = request.POST.get("start_time")
+            end = request.POST.get("end_time")
+
+            if not start or not end:
+                return HttpResponse(
+                    "<div class='bg-red-50 border border-red-200 rounded-xl "
+                    "p-4 text-sm text-red-700'>"
+                    "Debés completar hora de inicio y fin."
+                    "</div>"
+                )
+
+            from datetime import time
+            start_time = time(int(start.split(":")[0]), int(start.split(":")[1]))
+            end_time = time(int(end.split(":")[0]), int(end.split(":")[1]))
+
+            if start_time >= end_time:
+                return HttpResponse(
+                    "<div class='bg-red-50 border border-red-200 rounded-xl "
+                    "p-4 text-sm text-red-700'>"
+                    "La hora de fin debe ser posterior a la hora de inicio."
+                    "</div>"
+                )
+
+            try:
+                create_availability_slot(
+                    business=business,
+                    staff=staff,
+                    day_of_week=day,
+                    start_time=start_time,
+                    end_time=end_time,
+                )
+            except Exception as e:
+                return HttpResponse(
+                    "<div class='bg-red-50 border border-red-200 rounded-xl "
+                    f"p-4 text-sm text-red-700'>"
+                    f"Error: {e}"
+                    "</div>"
+                )
+
+        elif action == "delete":
+            slot_id = request.POST.get("slot_id")
+            try:
+                slot = AvailabilitySlot.objects.get(id=slot_id, business=business, staff=staff)
+                delete_availability_slot(slot)
+            except AvailabilitySlot.DoesNotExist:
+                return HttpResponse(
+                    "<div class='bg-red-50 border border-red-200 rounded-xl "
+                    "p-4 text-sm text-red-700'>"
+                    "Slot no encontrado."
+                    "</div>"
+                )
+
+        slots = AvailabilitySlot.objects.filter(
+            business=business,
+            staff=staff
+        ).order_by("day_of_week", "start_time")
+
+        slots_by_day = {i: [] for i in range(7)}
+        for slot in slots:
+            slots_by_day[slot.day_of_week].append({
+                "id": str(slot.id),
+                "start": slot.start_time.strftime("%H:%M"),
+                "end": slot.end_time.strftime("%H:%M"),
+            })
+
+        days = [
+            (0, "Lunes"),
+            (1, "Martes"),
+            (2, "Miércoles"),
+            (3, "Jueves"),
+            (4, "Viernes"),
+            (5, "Sábado"),
+            (6, "Domingo"),
+        ]
+
+        return render(request, "partials/staff_availability_slots.html", {
+            "staff": staff,
+            "slots_by_day": slots_by_day,
+            "days": days,
+        })
+
+
 class BusinessSettingsView(LoginRequiredMixin, View):
     def get(self, request):
         business = request.user.business

@@ -18,6 +18,7 @@ from .views import (
     LogoutView,
     ServiceCreateView,
     ServicesListView,
+    StaffAvailabilityView,
     StaffCreateView,
     StaffListView,
     UpcomingAppointmentsView,
@@ -96,6 +97,11 @@ urlpatterns = [
         "staff/create/",
         StaffCreateView.as_view(),
         name="staff_create",
+    ),
+    path(
+        "staff/<uuid:staff_id>/availability/",
+        StaffAvailabilityView.as_view(),
+        name="staff_availability",
     ),
     path(
         "settings/",
