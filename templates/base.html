@@ -15,7 +15,7 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
     {% if user.is_authenticated %}
-    <nav class="bg-white shadow-sm border-b border-gray-200">
+    <nav class="bg-white shadow-sm border-b border-gray-200 relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <div id="mobile-menu" class="hidden sm:hidden border-t border-gray-200">
+        <div id="mobile-menu" class="hidden sm:hidden absolute z-50 bg-white border-t border-gray-200 w-full">
             <div class="px-2 pt-2 pb-3 space-y-1">
                 <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Dashboard</a>
                 <a href="{% url 'appointments_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100">Turnos</a>
