@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views import View
 
+from apps.accounts.services import create_user as create_user_account
 from apps.appointments.models import Appointment, AppointmentStatus
 from apps.appointments.services import cancel_appointment, create_appointment
 from apps.customers.models import Customer
@@ -383,6 +384,8 @@ class StaffCreateView(LoginRequiredMixin, View):
                 "</div>"
             )
 
+        services = Service.objects.filter(business=business, is_active=True)
+
         existing_staff_user_ids = Staff.objects.filter(
             business=business
         ).values_list("user_id", flat=True)
@@ -392,11 +395,9 @@ class StaffCreateView(LoginRequiredMixin, View):
             is_active=True,
         ).exclude(id__in=existing_staff_user_ids)
 
-        services = Service.objects.filter(business=business, is_active=True)
-
         return render(
             request,
-            "partials/staff_form.html",
+            "partials/staff_create_form.html",
             {
                 "available_users": available_users,
                 "services": services,
@@ -412,13 +413,58 @@ class StaffCreateView(LoginRequiredMixin, View):
                 "</div>"
             )
 
-        user_id = request.POST.get("user_id")
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        first_name = request.POST.get("first_name", "")
+        last_name = request.POST.get("last_name", "")
         service_ids = request.POST.getlist("service_ids")
 
+        if username and email and password:
+            try:
+                user = create_user_account(
+                    business=business,
+                    username=username,
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name,
+                    role="staff",
+                )
+                create_staff(
+                    business=business,
+                    user=user,
+                    service_ids=service_ids if service_ids else None,
+                )
+                return HttpResponse(
+                    "<script>"
+                    "document.getElementById('modal').remove();"
+                    "document.getElementById('modal-backdrop').remove();"
+                    "window.location.reload();"
+                    "</script>"
+                )
+            except Exception as e:
+                error_msg = str(e)
+                if "username" in error_msg.lower():
+                    user_msg = "El nombre de usuario ya existe."
+                elif "email" in error_msg.lower():
+                    user_msg = "El email ya está registrado."
+                else:
+                    user_msg = (
+                        f"No se pudo crear el personal. {error_msg}"
+                    )
+                return HttpResponse(
+                    "<div class='bg-red-50 border border-red-200 rounded-md "
+                    "p-3 text-sm text-red-700'>"
+                    f"{user_msg}"
+                    "</div>"
+                )
+
+        user_id = request.POST.get("user_id")
         if not user_id:
             return HttpResponse(
                 "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
-                "Error: Debés seleccionar un usuario."
+                "Error: Debés seleccionar un usuario o crear uno nuevo."
                 "</div>"
             )
 
