@@ -1,0 +1,19 @@
+import uuid
+
+from django.db import models
+
+
+class Business(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True)
+    timezone = models.CharField(max_length=50, default="America/Argentina/Buenos_Aires")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "businesses"
+
+    def __str__(self):
+        return self.name

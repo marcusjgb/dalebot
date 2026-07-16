@@ -1,0 +1,57 @@
+[project]
+name = "whatsapp-appointments"
+version = "0.1.0"
+description = "Modular monolith for WhatsApp appointment scheduling"
+requires-python = ">=3.12"
+dependencies = [
+  "Django>=5.2,<6",
+  "django-ninja>=1.4,<2",
+  "psycopg[binary]>=3.2,<4",
+  "celery[redis]>=5.5,<6",
+  "redis>=6,<7",
+  "gunicorn>=23,<24",
+  "whitenoise>=6.9,<7",
+  "django-filter>=25,<26",
+  "django-prometheus>=2.3,<3",
+  "requests>=2.32,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+  "pytest-django>=4.11,<5",
+  "pytest-cov>=6,<7",
+  "ruff>=0.12,<1",
+  "mypy>=1.16,<2",
+  "django-stubs>=5.2,<6",
+  "djangorestframework-stubs>=3.16,<4",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-q --strict-markers --disable-warnings"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+exclude = ["**/migrations/**"]
+
+[tool.coverage.run]
+branch = true
+source = ["apps"]
+omit = ["*/tests/*", "*/migrations/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
+show_missing = true
+
+[tool.coverage.xml]
+output = "coverage.xml"

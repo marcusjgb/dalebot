@@ -1,0 +1,79 @@
+version: "3.8"
+
+services:
+  web:
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    resources:
+      limits:
+        cpus: "1.0"
+        memory: 1G
+      reservations:
+        cpus: "0.5"
+        memory: 512M
+
+  worker:
+    restart: unless-stopped
+    resources:
+      limits:
+        cpus: "0.5"
+        memory: 512M
+      reservations:
+        cpus: "0.25"
+        memory: 256M
+
+  beat:
+    restart: unless-stopped
+    resources:
+      limits:
+        cpus: "0.25"
+        memory: 256M
+      reservations:
+        cpus: "0.1"
+        memory: 128M
+
+  db:
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U appointments"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    resources:
+      limits:
+        cpus: "1.0"
+        memory: 2G
+      reservations:
+        cpus: "0.5"
+        memory: 1G
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    tmpfs:
+      - /tmp
+
+  redis:
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    resources:
+      limits:
+        cpus: "0.5"
+        memory: 256M
+      reservations:
+        cpus: "0.25"
+        memory: 128M
+    volumes:
+      - redis_data:/data
+    appendonly: yes
+
+volumes:
+  postgres_data:
+  redis_data:

@@ -1,0 +1,2 @@
+locust==v0.20.0
+pytest==v8.0.0
