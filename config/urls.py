@@ -8,5 +8,6 @@ urlpatterns = [
     path("api/", include("apps.accounts.urls")),
     path("api/whatsapp/", include("apps.whatsapp.urls")),
     path("health/", health, name="health"),
+    path("", include("apps.frontend.urls")),
     path("", include("django_prometheus.urls")),
 ]

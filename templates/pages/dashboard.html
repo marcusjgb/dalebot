@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - DaleBot{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div class="flex space-x-2">
+            <span class="px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                {{ subscription.get_plan_display|default:"Plan Free" }}
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-3xl font-bold text-indigo-600">{{ stats.appointments_today }}</div>
+            <div class="text-sm text-gray-500">Turnos hoy</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-3xl font-bold text-green-600">{{ stats.appointments_week }}</div>
+            <div class="text-sm text-gray-500">Turnos esta semana</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-3xl font-bold text-blue-600">{{ stats.customers }}</div>
+            <div class="text-sm text-gray-500">Clientes</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="text-3xl font-bold text-purple-600">{{ stats.pending }}</div>
+            <div class="text-sm text-gray-500">Pendientes</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Próximos turnos</h2>
+            </div>
+            <div class="p-6" hx-get="{% url 'appointments:upcoming' %}" hx-trigger="every 30s" hx-swap="innerHTML">
+                <div class="text-center text-gray-500">Cargando...</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Mensajes recientes</h2>
+            </div>
+            <div class="p-6" hx-get="{% url 'whatsapp:recent_messages' %}" hx-trigger="every 15s" hx-swap="innerHTML">
+                <div class="text-center text-gray-500">Cargando...</div>
+            </div>
+        </div>
+    </div>
+
+    {% if subscription %}
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Límites del plan</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+                <div class="text-sm text-gray-500">Personal</div>
+                <div class="flex items-center space-x-2">
+                    <span>{{ staff_count }}</span>
+                    <span class="text-gray-300">/</span>
+                    <span>{{ subscription.plan_limits.staff_limit }}</span>
+                </div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Servicios</div>
+                <div class="flex items-center space-x-2">
+                    <span>{{ services_count }}</span>
+                    <span class="text-gray-300">/</span>
+                    <span>{{ subscription.plan_limits.services_limit }}</span>
+                </div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Clientes</div>
+                <div class="flex items-center space-x-2">
+                    <span>{{ customers_count }}</span>
+                    <span class="text-gray-300">/</span>
+                    <span>{{ subscription.plan_limits.customers_limit }}</span>
+                </div>
+            </div>
+            <div>
+                <div class="text-sm text-gray-500">Turnos/mes</div>
+                <div class="flex items-center space-x-2">
+                    <span>{{ appointments_month }}</span>
+                    <span class="text-gray-300">/</span>
+                    <span>{{ subscription.plan_limits.appointments_per_month }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
