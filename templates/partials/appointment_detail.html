@@ -1,115 +1,119 @@
-<div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
-    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 class="text-lg font-medium text-gray-900">Detalle del Turno</h3>
-        <button hx-on:click="this.closest('.bg-white').remove(); document.getElementById('modal-backdrop').remove()"
-                class="text-gray-400 hover:text-gray-600">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-    </div>
-    <div class="p-6 space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-xs font-medium text-gray-500 uppercase">Cliente</label>
-                <p class="text-sm font-medium text-gray-900">{{ appointment.customer.name }}</p>
-                <p class="text-sm text-gray-500">{{ appointment.customer.phone }}</p>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 uppercase">Servicio</label>
-                <p class="text-sm font-medium text-gray-900">{{ appointment.service.name }}</p>
-                <p class="text-sm text-gray-500">{{ appointment.service.duration_minutes }} min</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-xs font-medium text-gray-500 uppercase">Personal</label>
-                <p class="text-sm font-medium text-gray-900">
-                    {{ appointment.staff.user.get_full_name|default:appointment.staff.user.username }}
-                </p>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 uppercase">Estado</label>
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                    {% if appointment.status == 'confirmed' %}bg-green-100 text-green-800
-                    {% elif appointment.status == 'pending' %}bg-yellow-100 text-yellow-800
-                    {% elif appointment.status == 'cancelled' %}bg-red-100 text-red-800
-                    {% elif appointment.status == 'completed' %}bg-blue-100 text-blue-800
-                    {% else %}bg-gray-100 text-gray-800{% endif %}">
-                    {{ appointment.get_status_display }}
-                </span>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-xs font-medium text-gray-500 uppercase">Fecha</label>
-                <p class="text-sm font-medium text-gray-900">{{ appointment.starts_at|date:"d/m/Y" }}</p>
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 uppercase">Hora</label>
-                <p class="text-sm font-medium text-gray-900">
-                    {{ appointment.starts_at|time:"H:i" }} - {{ appointment.ends_at|time:"H:i" }}
-                </p>
-            </div>
-        </div>
-
-        {% if appointment.notes %}
-        <div>
-            <label class="block text-xs font-medium text-gray-500 uppercase">Notas</label>
-            <p class="text-sm text-gray-700">{{ appointment.notes }}</p>
-        </div>
-        {% endif %}
-
-        {% if appointment.cancellation_reason %}
-        <div class="bg-red-50 border border-red-200 rounded-md p-3">
-            <label class="block text-xs font-medium text-red-500 uppercase">Razón de cancelación</label>
-            <p class="text-sm text-red-700">{{ appointment.cancellation_reason }}</p>
-        </div>
-        {% endif %}
-
-        <div class="text-xs text-gray-400">
-            Creado: {{ appointment.created_at|date:"d/m/Y H:i" }}
-        </div>
-
-        <div class="flex justify-end space-x-3 pt-4 border-t">
-            {% if appointment.status == 'pending' %}
-            <button hx-post="{% url 'appointments_confirm' appointment.id %}"
-                    hx-target="body"
-                    hx-swap="innerHTML"
-                    class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-                Confirmar
+<div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40"
+     onclick="if(event.target === this) { this.nextElementSibling.remove(); this.remove(); }"></div>
+<div id="modal" class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg font-medium text-gray-900">Detalle del Turno</h3>
+            <button onclick="this.closest('#modal').remove(); document.getElementById('modal-backdrop').remove()"
+                    class="text-gray-400 hover:text-gray-600">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
             </button>
-            {% endif %}
-            {% if appointment.status == 'pending' or appointment.status == 'confirmed' %}
-            <button hx-on:click="document.getElementById('cancel-form').classList.remove('hidden')"
-                    class="px-4 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50">
-                Cancelar turno
-            </button>
-            {% endif %}
         </div>
-
-        <div id="cancel-form" class="hidden border-t pt-4">
-            <label class="block text-xs font-medium text-gray-500 uppercase mb-2">Motivo de cancelación</label>
-            <form hx-post="{% url 'appointments_cancel' appointment.id %}"
-                  hx-target="body"
-                  hx-swap="innerHTML">
-                {% csrf_token %}
-                <textarea name="reason" rows="2" required
-                          class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 mb-2"
-                          placeholder="Ej: Cliente solicitó cancelar"></textarea>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" hx-on:click="this.closest('#cancel-form').classList.add('hidden')"
-                            class="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
-                        Volver
-                    </button>
-                    <button type="submit"
-                            class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
-                        Confirmar cancelación
-                    </button>
+        <div class="p-6 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase">Cliente</label>
+                    <p class="text-sm font-medium text-gray-900">{{ appointment.customer.name }}</p>
+                    <p class="text-sm text-gray-500">{{ appointment.customer.phone }}</p>
                 </div>
-            </form>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase">Servicio</label>
+                    <p class="text-sm font-medium text-gray-900">{{ appointment.service.name }}</p>
+                    <p class="text-sm text-gray-500">{{ appointment.service.duration_minutes }} min</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase">Personal</label>
+                    <p class="text-sm font-medium text-gray-900">
+                        {{ appointment.staff.user.get_full_name|default:appointment.staff.user.username }}
+                    </p>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase">Estado</label>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                        {% if appointment.status == 'confirmed' %}bg-green-100 text-green-800
+                        {% elif appointment.status == 'pending' %}bg-yellow-100 text-yellow-800
+                        {% elif appointment.status == 'cancelled' %}bg-red-100 text-red-800
+                        {% elif appointment.status == 'completed' %}bg-blue-100 text-blue-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ appointment.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase">Fecha</label>
+                    <p class="text-sm font-medium text-gray-900">{{ appointment.starts_at|date:"d/m/Y" }}</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 uppercase">Hora</label>
+                    <p class="text-sm font-medium text-gray-900">
+                        {{ appointment.starts_at|time:"H:i" }} - {{ appointment.ends_at|time:"H:i" }}
+                    </p>
+                </div>
+            </div>
+
+            {% if appointment.notes %}
+            <div>
+                <label class="block text-xs font-medium text-gray-500 uppercase">Notas</label>
+                <p class="text-sm text-gray-700">{{ appointment.notes }}</p>
+            </div>
+            {% endif %}
+
+            {% if appointment.cancellation_reason %}
+            <div class="bg-red-50 border border-red-200 rounded-md p-3">
+                <label class="block text-xs font-medium text-red-500 uppercase">Razón de cancelación</label>
+                <p class="text-sm text-red-700">{{ appointment.cancellation_reason }}</p>
+            </div>
+            {% endif %}
+
+            <div class="text-xs text-gray-400">
+                Creado: {{ appointment.created_at|date:"d/m/Y H:i" }}
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4 border-t">
+                {% if appointment.status == 'pending' %}
+                <button hx-post="{% url 'appointments_confirm' appointment.id %}"
+                        hx-target="body"
+                        hx-swap="innerHTML"
+                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                    Confirmar
+                </button>
+                {% endif %}
+                {% if appointment.status == 'pending' or appointment.status == 'confirmed' %}
+                <button hx-on:click="document.getElementById('cancel-form').classList.remove('hidden')"
+                        class="px-4 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50">
+                    Cancelar turno
+                </button>
+                {% endif %}
+            </div>
+
+            <div id="cancel-form" class="hidden border-t pt-4">
+                <label class="block text-xs font-medium text-gray-500 uppercase mb-2">Motivo de cancelación</label>
+                <form hx-post="{% url 'appointments_cancel' appointment.id %}"
+                      hx-target="body"
+                      hx-swap="innerHTML">
+                    {% csrf_token %}
+                    <textarea name="reason" rows="2" required
+                              class="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 mb-2"
+                              placeholder="Ej: Cliente solicitó cancelar"></textarea>
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" hx-on:click="this.closest('#cancel-form').classList.add('hidden')"
+                                class="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
+                            Volver
+                        </button>
+                        <button type="submit"
+                                class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                            Confirmar cancelación
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

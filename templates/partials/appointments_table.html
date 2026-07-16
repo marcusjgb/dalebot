@@ -15,8 +15,7 @@
         <tr class="hover:bg-gray-50 cursor-pointer"
             hx-get="{% url 'appointments_detail' appointment.id %}"
             hx-target="#modal-container"
-            hx-swap="innerHTML"
-            onclick="openModal()">
+            hx-swap="innerHTML">
             <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm font-medium text-gray-900">{{ appointment.customer.name }}</div>
                 <div class="text-sm text-gray-500">{{ appointment.customer.phone }}</div>
