@@ -351,15 +351,17 @@ class AvailableSlotsView(LoginRequiredMixin, View):
                 '</p>'
             )
 
-        html = '<div class="grid grid-cols-4 gap-2">'
+        html = '<div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto">'
         for t in available_times:
             time_str = t.strftime("%H:%M")
             html += f'''
             <button type="button"
                     onclick="selectTimeSlot('{time_str}')"
-                    class="time-slot px-3 py-2 text-sm font-medium rounded-xl
-                           border border-argen-200 text-argen-700
-                           hover:bg-argen-50 hover:border-argen-400 transition-all">
+                    data-time="{time_str}"
+                    class="time-slot flex-shrink-0 px-4 py-2.5 text-sm font-semibold rounded-xl
+                           border-2 border-argen-200 text-argen-700 bg-white
+                           hover:bg-argen-500 hover:text-white hover:border-argen-500
+                           transition-all duration-200 cursor-pointer">
                 {time_str}
             </button>
             '''

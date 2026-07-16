@@ -60,7 +60,7 @@
                 <div id="time-slots-message-edit" class="text-sm text-argen-500 py-2">
                     Seleccioná una fecha para ver los horarios disponibles
                 </div>
-                <div id="time-slots-edit" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 hidden"></div>
+                <div id="time-slots-edit" class="flex flex-wrap gap-2 hidden"></div>
                 <input type="hidden" name="time" id="selected_time_edit" required value="{{ appointment.starts_at|time:'H:i' }}">
             </div>
             <div>
@@ -89,12 +89,12 @@
     function selectTimeSlotEdit(time) {
         document.querySelectorAll('#time-slots-edit .time-slot').forEach(btn => {
             btn.classList.remove('bg-argen-500', 'text-white', 'border-argen-500');
-            btn.classList.add('border-argen-200', 'text-argen-700', 'hover:bg-argen-50');
+            btn.classList.add('border-argen-200', 'text-argen-700', 'bg-white');
         });
-        const selectedBtn = document.querySelector(`#time-slots-edit .time-slot[onclick="selectTimeSlotEdit('${time}')"]`);
+        const selectedBtn = document.querySelector(`#time-slots-edit .time-slot[data-time="${time}"]`);
         if (selectedBtn) {
             selectedBtn.classList.add('bg-argen-500', 'text-white', 'border-argen-500');
-            selectedBtn.classList.remove('border-argen-200', 'text-argen-700', 'hover:bg-argen-50');
+            selectedBtn.classList.remove('border-argen-200', 'text-argen-700', 'bg-white');
         }
         document.getElementById('selected_time_edit').value = time;
     }

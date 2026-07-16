@@ -74,7 +74,7 @@
                 <div id="time-slots-message" class="text-sm text-argen-500 py-2">
                     Seleccioná una fecha para ver los horarios disponibles
                 </div>
-                <div id="time-slots" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 hidden"></div>
+                <div id="time-slots" class="flex flex-wrap gap-2 hidden"></div>
                 <input type="hidden" name="time" id="selected_time" required>
             </div>
             <div id="modal-result"></div>
@@ -99,12 +99,12 @@
     function selectTimeSlot(time) {
         document.querySelectorAll('.time-slot').forEach(btn => {
             btn.classList.remove('bg-argen-500', 'text-white', 'border-argen-500');
-            btn.classList.add('border-argen-200', 'text-argen-700', 'hover:bg-argen-50');
+            btn.classList.add('border-argen-200', 'text-argen-700', 'bg-white');
         });
-        const selectedBtn = document.querySelector(`.time-slot[onclick="selectTimeSlot('${time}')"]`);
+        const selectedBtn = document.querySelector(`.time-slot[data-time="${time}"]`);
         if (selectedBtn) {
             selectedBtn.classList.add('bg-argen-500', 'text-white', 'border-argen-500');
-            selectedBtn.classList.remove('border-argen-200', 'text-argen-700', 'hover:bg-argen-50');
+            selectedBtn.classList.remove('border-argen-200', 'text-argen-700', 'bg-white');
         }
         document.getElementById('selected_time').value = time;
     }
