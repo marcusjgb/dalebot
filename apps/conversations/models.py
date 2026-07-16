@@ -31,6 +31,7 @@ class Conversation(models.Model):
         default=ConversationStatus.ACTIVE,
     )
     state = models.CharField(max_length=50, blank=True, default="")
+    context_data = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
