@@ -230,13 +230,12 @@ class AppointmentCancelView(LoginRequiredMixin, View):
         try:
             appointment = Appointment.objects.get(id=appointment_id, business=business)
             cancel_appointment(appointment, request.user)
-            appointments = Appointment.objects.filter(
-                business=business
-            ).select_related("customer", "service", "staff").order_by("-starts_at")[:50]
-            return render(
-                request,
-                "partials/appointments_table.html",
-                {"appointments": appointments},
+            return HttpResponse(
+                "<script>"
+                "document.getElementById('modal').remove();"
+                "document.getElementById('modal-backdrop').remove();"
+                "window.location.reload();"
+                "</script>"
             )
         except Exception as e:
             return HttpResponse(
@@ -270,10 +269,12 @@ class AppointmentConfirmView(LoginRequiredMixin, View):
         try:
             appointment = Appointment.objects.get(id=appointment_id, business=business)
             confirm_appointment(appointment)
-            return render(
-                request,
-                "partials/appointment_detail.html",
-                {"appointment": appointment},
+            return HttpResponse(
+                "<script>"
+                "document.getElementById('modal').remove();"
+                "document.getElementById('modal-backdrop').remove();"
+                "window.location.reload();"
+                "</script>"
             )
         except Exception as e:
             return HttpResponse(
