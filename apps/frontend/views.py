@@ -144,6 +144,10 @@ class AppointmentsListView(LoginRequiredMixin, View):
 class AppointmentCreateView(LoginRequiredMixin, View):
     def get(self, request):
         business = request.user.business
+        if not business:
+            return HttpResponse(
+                "<div class='p-6 text-center'><p class='text-red-600'>Error: Tu usuario no tiene un negocio asignado.</p><p class='text-gray-600 mt-2'>Contacta al administrador.</p></div>"
+            )
         customers = Customer.objects.filter(business=business, is_active=True)
         services = Service.objects.filter(business=business, is_active=True)
         staff_members = Staff.objects.filter(business=business, is_active=True)

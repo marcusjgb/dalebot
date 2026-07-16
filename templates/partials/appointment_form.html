@@ -1,19 +1,32 @@
-<div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40" hx-on:click="this.parentElement.remove()"></div>
+<div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40"
+     hx-on:click="this.nextElementSibling.remove(); this.remove()"></div>
 <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg font-medium text-gray-900">Nuevo Turno</h3>
-            <button hx-on:click="this.closest('#modal, #modal-backdrop').remove()" class="text-gray-400 hover:text-gray-600">
+            <button hx-on:click="this.closest('#modal').remove(); document.getElementById('modal-backdrop').remove()"
+                    class="text-gray-400 hover:text-gray-600">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </div>
         <form hx-post="{% url 'appointments_create' %}"
-              hx-target="#modal-container"
+              hx-target="#modal-result"
               hx-swap="innerHTML"
               class="p-6 space-y-4">
             {% csrf_token %}
+            {% if not customers or not services or not staff_members %}
+            <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+                <p class="text-yellow-700 text-sm">
+                    <strong>Faltan datos:</strong>
+                    {% if not customers %}Clientes{% endif %}
+                    {% if not services %}{% if not customers %}, {% endif %}Servicios{% endif %}
+                    {% if not staff_members %}{% if not customers or not services %}, {% endif %}Personal{% endif %}
+                </p>
+                <p class="text-yellow-600 text-sm mt-1">Crealos en el panel Admin primero.</p>
+            </div>
+            {% endif %}
             <div>
                 <label for="customer" class="block text-sm font-medium text-gray-700">Cliente</label>
                 <select name="customer_id" id="customer" required
@@ -21,6 +34,8 @@
                     <option value="">Seleccionar cliente...</option>
                     {% for customer in customers %}
                     <option value="{{ customer.id }}">{{ customer.name }} ({{ customer.phone }})</option>
+                    {% empty %}
+                    <option value="" disabled>No hay clientes</option>
                     {% endfor %}
                 </select>
             </div>
@@ -31,6 +46,8 @@
                     <option value="">Seleccionar servicio...</option>
                     {% for service in services %}
                     <option value="{{ service.id }}">{{ service.name }} ({{ service.duration_minutes }} min)</option>
+                    {% empty %}
+                    <option value="" disabled>No hay servicios</option>
                     {% endfor %}
                 </select>
             </div>
@@ -41,6 +58,8 @@
                     <option value="">Seleccionar personal...</option>
                     {% for staff in staff_members %}
                     <option value="{{ staff.id }}">{{ staff.user.get_full_name|default:staff.user.username }}</option>
+                    {% empty %}
+                    <option value="" disabled>No hay personal</option>
                     {% endfor %}
                 </select>
             </div>
@@ -56,8 +75,9 @@
                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
             </div>
+            <div id="modal-result"></div>
             <div class="flex justify-end space-x-3 pt-4">
-                <button type="button" hx-on:click="this.closest('#modal, #modal-backdrop').remove()"
+                <button type="button" onclick="document.getElementById('modal').remove(); document.getElementById('modal-backdrop').remove()"
                         class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Cancelar
                 </button>
