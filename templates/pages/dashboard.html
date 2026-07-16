@@ -37,16 +37,7 @@
             <div class="px-6 py-4 border-b border-gray-200">
                 <h2 class="text-lg font-medium text-gray-900">Próximos turnos</h2>
             </div>
-            <div class="p-6" hx-get="{% url 'appointments:upcoming' %}" hx-trigger="every 30s" hx-swap="innerHTML">
-                <div class="text-center text-gray-500">Cargando...</div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-lg font-medium text-gray-900">Mensajes recientes</h2>
-            </div>
-            <div class="p-6" hx-get="{% url 'whatsapp:recent_messages' %}" hx-trigger="every 15s" hx-swap="innerHTML">
+            <div class="p-6" hx-get="{% url 'upcoming_appointments' %}" hx-trigger="every 30s" hx-swap="innerHTML">
                 <div class="text-center text-gray-500">Cargando...</div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-from django.contrib.auth.models import PermissionManager
+from django.contrib.auth.models import BaseUserManager
 from django.db import models
 
 
@@ -10,7 +10,7 @@ class UserQuerySet(models.QuerySet):
         return self.filter(is_active=True)
 
 
-class UserManager(PermissionManager):
+class UserManager(BaseUserManager):
     def get_queryset(self):
         return UserQuerySet(self.model, using=self._db)
 

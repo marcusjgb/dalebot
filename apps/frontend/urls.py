@@ -14,6 +14,6 @@ urlpatterns = [
     path(
         "appointments/upcoming/",
         UpcomingAppointmentsView.as_view(),
-        name="appointments:upcoming",
+        name="upcoming_appointments",
     ),
 ]
