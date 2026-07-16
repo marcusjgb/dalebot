@@ -9,7 +9,7 @@ from django.views import View
 
 from apps.accounts.services import create_user as create_user_account
 from apps.appointments.models import Appointment, AppointmentStatus
-from apps.appointments.services import cancel_appointment, create_appointment
+from apps.appointments.services import cancel_appointment, confirm_appointment, create_appointment
 from apps.customers.models import Customer
 from apps.customers.services import create_customer
 from apps.services.models import Service
@@ -242,6 +242,43 @@ class AppointmentCancelView(LoginRequiredMixin, View):
             return HttpResponse(
                 "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
                 f"Error al cancelar: {e}"
+                "</div>"
+            )
+
+
+class AppointmentDetailView(LoginRequiredMixin, View):
+    def get(self, request, appointment_id):
+        business = request.user.business
+        try:
+            appointment = Appointment.objects.select_related(
+                "customer", "service", "staff", "staff__user"
+            ).get(id=appointment_id, business=business)
+            return render(
+                request,
+                "partials/appointment_detail.html",
+                {"appointment": appointment},
+            )
+        except Appointment.DoesNotExist:
+            return HttpResponse(
+                "<div class='p-6 text-center text-red-600'>Turno no encontrado.</div>"
+            )
+
+
+class AppointmentConfirmView(LoginRequiredMixin, View):
+    def post(self, request, appointment_id):
+        business = request.user.business
+        try:
+            appointment = Appointment.objects.get(id=appointment_id, business=business)
+            confirm_appointment(appointment)
+            return render(
+                request,
+                "partials/appointment_detail.html",
+                {"appointment": appointment},
+            )
+        except Exception as e:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"Error al confirmar: {e}"
                 "</div>"
             )
 

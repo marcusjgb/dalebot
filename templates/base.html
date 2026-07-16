@@ -64,6 +64,31 @@
                 setTimeout(() => event.detail.target.classList.add('hidden'), 3000);
             }
         });
+
+        function openModal() {
+            document.getElementById('modal-backdrop').classList.remove('hidden');
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').remove();
+            document.getElementById('modal-backdrop').remove();
+        }
+
+        document.body.addEventListener('htmx:beforeSwap', (event) => {
+            if (event.detail.target.id === 'modal-container') {
+                const content = event.detail.target.innerHTML;
+                if (content.trim()) {
+                    document.getElementById('modal-container').innerHTML =
+                        '<div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40" onclick="closeModal()"></div>' +
+                        '<div id="modal" class="fixed inset-0 z-50 flex items-center justify-center">' +
+                        content +
+                        '</div>';
+                    event.detail.target.innerHTML = '';
+                    event.stopPropagation();
+                }
+            }
+        });
     </script>
 </body>
 </html>
