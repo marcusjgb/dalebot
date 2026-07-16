@@ -17,7 +17,7 @@
     <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex space-x-4">
-                <button hx-get="{% url 'appointments:list' %}"
+                <button hx-get="{% url 'appointments_list' %}"
                         hx-trigger="click"
                         hx-target="#appointments-list"
                         class="px-3 py-1 text-sm rounded-md {% if status == 'all' %}bg-indigo-100 text-indigo-700{% endif %}">
@@ -31,7 +31,7 @@
                 </button>
             </div>
         </div>
-        <div id="appointments-list" class="p-6" hx-get="{% url 'appointments:list' %}" hx-trigger="revealed" hx-swap="innerHTML">
+        <div id="appointments-list" class="p-6" hx-get="{% url 'appointments_list' %}" hx-trigger="revealed" hx-swap="innerHTML">
             {% include "partials/appointments_table.html" %}
         </div>
     </div>

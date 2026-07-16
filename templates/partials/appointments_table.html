@@ -39,10 +39,6 @@
                 </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button hx-get="{% url 'appointments:detail' appointment.id %}"
-                        hx-target="#modal-container"
-                        hx-swap="innerHTML"
-                        class="text-indigo-600 hover:text-indigo-900 mr-3">Ver</button>
                 {% if appointment.status == 'pending' or appointment.status == 'confirmed' %}
                 <button hx-post="{% url 'appointments_cancel' appointment.id %}"
                         hx-target="#appointments-list"
