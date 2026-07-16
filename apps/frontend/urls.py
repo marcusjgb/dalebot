@@ -22,16 +22,16 @@ urlpatterns = [
     path(
         "appointments/",
         AppointmentsListView.as_view(),
-        name="appointments:list",
+        name="appointments_list",
     ),
     path(
         "appointments/create/",
         AppointmentCreateView.as_view(),
-        name="appointments:create",
+        name="appointments_create",
     ),
     path(
         "appointments/<uuid:appointment_id>/cancel/",
         AppointmentCancelView.as_view(),
-        name="appointments:cancel",
+        name="appointments_cancel",
     ),
 ]

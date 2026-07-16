@@ -44,7 +44,7 @@
                         hx-swap="innerHTML"
                         class="text-indigo-600 hover:text-indigo-900 mr-3">Ver</button>
                 {% if appointment.status == 'pending' or appointment.status == 'confirmed' %}
-                <button hx-post="{% url 'appointments:cancel' appointment.id %}"
+                <button hx-post="{% url 'appointments_cancel' appointment.id %}"
                         hx-target="#appointments-list"
                         hx-swap="innerHTML"
                         hx-confirm="¿Cancelar este turno?"
