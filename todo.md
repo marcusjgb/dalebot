@@ -57,7 +57,7 @@
 ## 🔄 Por Hacer
 
 ### Frontend
-- [ ] Página de Staff (listar, crear)
+- [x] Página de Staff (listar, crear)
 - [ ] Detalle de Turno (ver info completa)
 - [ ] Confirmar turno (cambiar estado)
 - [ ] Filtros funcionales en lista de turnos (pendientes, confirmados)
@@ -128,10 +128,11 @@ dalebot/
 - **Turnos:** http://localhost:8000/appointments/
 - **Clientes:** http://localhost:8000/customers/
 - **Servicios:** http://localhost:8000/services/
+- **Personal:** http://localhost:8000/staff/
 - **Repo:** https://github.com/marcusjgb/dalebot
 
 ---
 
 ## 🏃 Próximo Paso Recomendado
 
-Página de **Staff** para completar el CRUD básico del negocio.
+Detalle de **Turno** o **Confirmar turno** para completar la gestión de turnos.
