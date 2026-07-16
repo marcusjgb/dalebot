@@ -10,7 +10,9 @@ from django.views import View
 from apps.appointments.models import Appointment, AppointmentStatus
 from apps.appointments.services import cancel_appointment, create_appointment
 from apps.customers.models import Customer
+from apps.customers.services import create_customer
 from apps.services.models import Service
+from apps.services.services import create_service
 from apps.staff.models import Staff
 from apps.subscriptions.models import Subscription
 
@@ -146,7 +148,10 @@ class AppointmentCreateView(LoginRequiredMixin, View):
         business = request.user.business
         if not business:
             return HttpResponse(
-                "<div class='p-6 text-center'><p class='text-red-600'>Error: Tu usuario no tiene un negocio asignado.</p><p class='text-gray-600 mt-2'>Contacta al administrador.</p></div>"
+                "<div class='p-6 text-center'>"
+                "<p class='text-red-600'>Error: Tu usuario no tiene un negocio asignado.</p>"
+                "<p class='text-gray-600 mt-2'>Contacta al administrador.</p>"
+                "</div>"
             )
         customers = Customer.objects.filter(business=business, is_active=True)
         services = Service.objects.filter(business=business, is_active=True)
@@ -195,15 +200,23 @@ class AppointmentCreateView(LoginRequiredMixin, View):
         except Exception as e:
             error_msg = str(e)
             if "Slot not available" in error_msg:
-                user_msg = "El personal no tiene disponibilidad en ese horario. Por favor elegí otro horario o fecha."
+                user_msg = (
+                    "El personal no tiene disponibilidad en ese horario. "
+                    "Por favor elegí otro horario o fecha."
+                )
             elif "already has an appointment" in error_msg:
-                user_msg = "El personal ya tiene un turno en ese horario. Por favor elegí otro horario."
+                user_msg = (
+                    "El personal ya tiene un turno en ese horario. "
+                    "Por favor elegí otro horario."
+                )
             elif "not assigned to service" in error_msg:
                 user_msg = "El personal seleccionado no está asignado a este servicio."
             else:
                 user_msg = f"No se pudo crear el turno. {error_msg}"
             return HttpResponse(
-                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>{user_msg}</div>"
+                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"{user_msg}"
+                f"</div>"
             )
 
 
@@ -223,7 +236,120 @@ class AppointmentCancelView(LoginRequiredMixin, View):
             )
         except Exception as e:
             return HttpResponse(
-                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
                 f"Error al cancelar: {e}"
+                "</div>"
+            )
+
+
+class CustomersListView(LoginRequiredMixin, View):
+    def get(self, request):
+        business = request.user.business
+        if not business:
+            return HttpResponse(
+                "<div class='p-6 text-center'>"
+                "<p class='text-red-600'>Error: No tenés un negocio asignado.</p>"
+                "</div>"
+            )
+        customers = Customer.objects.filter(business=business).prefetch_related("appointments")
+        return render(request, "pages/customers_list.html", {"customers": customers})
+
+
+class CustomerCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, "partials/customer_form.html")
+
+    def post(self, request):
+        business = request.user.business
+        if not business:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                "Error: No tenés un negocio asignado."
+                "</div>"
+            )
+
+        name = request.POST.get("name")
+        phone = request.POST.get("phone")
+        email = request.POST.get("email", "")
+        notes = request.POST.get("notes", "")
+
+        try:
+            create_customer(
+                business=business,
+                name=name,
+                phone=phone,
+                email=email,
+                notes=notes,
+            )
+            return HttpResponse(
+                "<script>"
+                "document.getElementById('modal').remove();"
+                "document.getElementById('modal-backdrop').remove();"
+                "window.location.reload();"
+                "</script>"
+            )
+        except Exception as e:
+            error_msg = str(e)
+            if "unique" in error_msg.lower():
+                user_msg = "Ya existe un cliente con ese número de teléfono."
+            else:
+                user_msg = f"No se pudo crear el cliente. {error_msg}"
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"{user_msg}"
+                "</div>"
+            )
+
+
+class ServicesListView(LoginRequiredMixin, View):
+    def get(self, request):
+        business = request.user.business
+        if not business:
+            return HttpResponse(
+                "<div class='p-6 text-center'>"
+                "<p class='text-red-600'>Error: No tenés un negocio asignado.</p>"
+                "</div>"
+            )
+        services = Service.objects.filter(business=business)
+        return render(request, "pages/services_list.html", {"services": services})
+
+
+class ServiceCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, "partials/service_form.html")
+
+    def post(self, request):
+        business = request.user.business
+        if not business:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                "Error: No tenés un negocio asignado."
+                "</div>"
+            )
+
+        name = request.POST.get("name")
+        description = request.POST.get("description", "")
+        duration = request.POST.get("duration_minutes", "30")
+        price = request.POST.get("price", "0")
+
+        try:
+            create_service(
+                business=business,
+                name=name,
+                duration_minutes=int(duration),
+                price=float(price) if price else 0,
+                description=description,
+            )
+            return HttpResponse(
+                "<script>"
+                "document.getElementById('modal').remove();"
+                "document.getElementById('modal-backdrop').remove();"
+                "window.location.reload();"
+                "</script>"
+            )
+        except Exception as e:
+            return HttpResponse(
+                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"No se pudo crear el servicio. {e}"
                 f"</div>"
             )

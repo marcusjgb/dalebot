@@ -4,9 +4,13 @@ from .views import (
     AppointmentCancelView,
     AppointmentCreateView,
     AppointmentsListView,
+    CustomerCreateView,
+    CustomersListView,
     DashboardView,
     LoginView,
     LogoutView,
+    ServiceCreateView,
+    ServicesListView,
     UpcomingAppointmentsView,
 )
 
@@ -33,5 +37,25 @@ urlpatterns = [
         "appointments/<uuid:appointment_id>/cancel/",
         AppointmentCancelView.as_view(),
         name="appointments_cancel",
+    ),
+    path(
+        "customers/",
+        CustomersListView.as_view(),
+        name="customers_list",
+    ),
+    path(
+        "customers/create/",
+        CustomerCreateView.as_view(),
+        name="customers_create",
+    ),
+    path(
+        "services/",
+        ServicesListView.as_view(),
+        name="services_list",
+    ),
+    path(
+        "services/create/",
+        ServiceCreateView.as_view(),
+        name="services_create",
     ),
 ]

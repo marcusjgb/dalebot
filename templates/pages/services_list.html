@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Servicios - DaleBot{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Servicios</h1>
+        <button hx-get="{% url 'services_create' %}"
+                hx-target="#modal-container"
+                hx-swap="innerHTML"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+            + Nuevo servicio
+        </button>
+    </div>
+
+    <div class="bg-white rounded-lg shadow">
+        <div id="services-list" class="p-6">
+            {% include "partials/services_table.html" %}
+        </div>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+{% endblock %}

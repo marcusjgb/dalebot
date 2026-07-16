@@ -35,8 +35,10 @@
 - [x] Login/Logout con Django auth
 - [x] Dashboard con stats
 - [x] Página de Turnos (Lista + Crear + Cancelar)
+- [x] Página de Clientes (Lista + Crear)
+- [x] Página de Servicios (Lista + Crear)
 - [x] Mensajes de error amigables en español
-- [x] Nav menu: Dashboard | Turnos | Admin
+- [x] Nav menu: Dashboard | Turnos | Clientes | Servicios | Admin
 
 ### Commits
 ```
@@ -54,8 +56,8 @@
 ## 🔄 Por Hacer
 
 ### Frontend
-- [ ] Página de Clientes (listar, crear)
-- [ ] Página de Servicios (listar, crear)
+- [x] Página de Clientes (listar, crear)
+- [x] Página de Servicios (listar, crear)
 - [ ] Página de Staff (listar, crear)
 - [ ] Detalle de Turno (ver info completa)
 - [ ] Confirmar turno (cambiar estado)
