@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.views import View
 
 from apps.appointments.models import Appointment, AppointmentStatus
+from apps.appointments.services import cancel_appointment, create_appointment
 from apps.customers.models import Customer
 from apps.services.models import Service
 from apps.staff.models import Staff
@@ -129,3 +130,77 @@ class UpcomingAppointmentsView(LoginRequiredMixin, View):
             """
         html += "</div>"
         return HttpResponse(html)
+
+
+class AppointmentsListView(LoginRequiredMixin, View):
+    def get(self, request):
+        business = request.user.business
+        appointments = Appointment.objects.filter(
+            business=business
+        ).select_related("customer", "service", "staff").order_by("-starts_at")[:50]
+        return render(request, "pages/appointments_list.html", {"appointments": appointments})
+
+
+class AppointmentCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        business = request.user.business
+        customers = Customer.objects.filter(business=business, is_active=True)
+        services = Service.objects.filter(business=business, is_active=True)
+        staff_members = Staff.objects.filter(business=business, is_active=True)
+        return render(
+            request,
+            "partials/appointment_form.html",
+            {
+                "customers": customers,
+                "services": services,
+                "staff_members": staff_members,
+            },
+        )
+
+    def post(self, request):
+        business = request.user.business
+        customer_id = request.POST.get("customer_id")
+        service_id = request.POST.get("service_id")
+        staff_id = request.POST.get("staff_id")
+        date = request.POST.get("date")
+        time = request.POST.get("time")
+
+        from datetime import datetime
+        starts_at = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
+        starts_at = timezone.make_aware(starts_at)
+
+        customer = Customer.objects.get(id=customer_id)
+        service = Service.objects.get(id=service_id)
+        staff = Staff.objects.get(id=staff_id)
+
+        try:
+            create_appointment(
+                business=business,
+                customer=customer,
+                service=service,
+                staff=staff,
+                starts_at=starts_at,
+            )
+            return HttpResponse(
+                "<script>window.location.reload()</script>"
+            )
+        except Exception as e:
+            return HttpResponse(f"<div class='text-red-600'>Error: {e}</div>")
+
+
+class AppointmentCancelView(LoginRequiredMixin, View):
+    def post(self, request, appointment_id):
+        business = request.user.business
+        try:
+            appointment = Appointment.objects.get(id=appointment_id, business=business)
+            cancel_appointment(appointment, request.user)
+            appointments = Appointment.objects.filter(
+                business=business
+            ).select_related("customer", "service", "staff").order_by("-starts_at")[:50]
+            return render(
+                request,
+                "partials/appointments_table.html",
+                {"appointments": appointments},
+            )
+        except Exception as e:
+            return HttpResponse(f"<div class='text-red-600'>Error: {e}</div>")

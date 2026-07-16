@@ -1,6 +1,9 @@
 from django.urls import path
 
 from .views import (
+    AppointmentCancelView,
+    AppointmentCreateView,
+    AppointmentsListView,
     DashboardView,
     LoginView,
     LogoutView,
@@ -15,5 +18,20 @@ urlpatterns = [
         "appointments/upcoming/",
         UpcomingAppointmentsView.as_view(),
         name="upcoming_appointments",
+    ),
+    path(
+        "appointments/",
+        AppointmentsListView.as_view(),
+        name="appointments:list",
+    ),
+    path(
+        "appointments/create/",
+        AppointmentCreateView.as_view(),
+        name="appointments:create",
+    ),
+    path(
+        "appointments/<uuid:appointment_id>/cancel/",
+        AppointmentCancelView.as_view(),
+        name="appointments:cancel",
     ),
 ]
