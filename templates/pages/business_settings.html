@@ -100,5 +100,79 @@
             </dl>
         </div>
     </div>
+
+    <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Integración WhatsApp</h2>
+        </div>
+        <div class="p-6">
+            <form hx-post="{% url 'business_settings' %}"
+                  hx-target="#settings-result"
+                  hx-swap="innerHTML"
+                  class="space-y-4">
+                {% csrf_token %}
+                <div class="flex items-center">
+                    <input type="checkbox" name="whatsapp_enabled" id="whatsapp_enabled"
+                           {% if business.whatsapp_enabled %}checked{% endif %}
+                           class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+                    <label for="whatsapp_enabled" class="ml-2 block text-sm text-gray-700">
+                        Habilitar WhatsApp
+                    </label>
+                </div>
+                <div>
+                    <label for="whatsapp_phone_number_id" class="block text-sm font-medium text-gray-700">
+                        WhatsApp Phone Number ID
+                    </label>
+                    <input type="text" name="whatsapp_phone_number_id" id="whatsapp_phone_number_id"
+                           value="{{ business.whatsapp_phone_number_id }}"
+                           placeholder="123456789012345"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <p class="mt-1 text-xs text-gray-500">
+                        Encontrás este valor en Meta Business Console → WhatsApp → Números de teléfono
+                    </p>
+                </div>
+                <div>
+                    <label for="whatsapp_verify_token" class="block text-sm font-medium text-gray-700">
+                        Verify Token
+                    </label>
+                    <input type="text" name="whatsapp_verify_token" id="whatsapp_verify_token"
+                           value="{{ business.whatsapp_verify_token }}"
+                           placeholder="MiTokenDeVerificacion123"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <p class="mt-1 text-xs text-gray-500">
+                        Token que configurarás en Meta Webhook Subscription
+                    </p>
+                </div>
+                <div>
+                    <label for="whatsapp_access_token" class="block text-sm font-medium text-gray-700">
+                        WhatsApp Access Token
+                    </label>
+                    <input type="password" name="whatsapp_access_token" id="whatsapp_access_token"
+                           value="{{ business.whatsapp_access_token }}"
+                           placeholder="EAACEdEose0cBAxxxxx"
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <p class="mt-1 text-xs text-gray-500">
+                        Token de acceso permanente desde Meta Business Console
+                    </p>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <h4 class="text-sm font-medium text-blue-800">Configuración del Webhook</h4>
+                    <p class="mt-1 text-xs text-blue-600">
+                        URL del webhook: <code class="bg-blue-100 px-1 rounded">{{ request.scheme }}://{{ request.host }}/whatsapp/webhook/</code>
+                    </p>
+                    <p class="mt-1 text-xs text-blue-600">
+                        Verificá que esta URL sea accesible desde internet (no funciona en localhost)
+                    </p>
+                </div>
+                <div id="settings-result"></div>
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Guardar WhatsApp
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

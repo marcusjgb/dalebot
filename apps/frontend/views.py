@@ -639,6 +639,10 @@ class BusinessSettingsView(LoginRequiredMixin, View):
         email = request.POST.get("email", "").strip()
         address = request.POST.get("address", "").strip()
         timezone_val = request.POST.get("timezone", "America/Argentina/Buenos_Aires").strip()
+        whatsapp_enabled = request.POST.get("whatsapp_enabled") == "on"
+        whatsapp_phone_number_id = request.POST.get("whatsapp_phone_number_id", "").strip()
+        whatsapp_verify_token = request.POST.get("whatsapp_verify_token", "").strip()
+        whatsapp_access_token = request.POST.get("whatsapp_access_token", "").strip()
 
         if not name:
             return HttpResponse(
@@ -655,6 +659,10 @@ class BusinessSettingsView(LoginRequiredMixin, View):
                 email=email,
                 address=address,
                 timezone=timezone_val,
+                whatsapp_enabled=whatsapp_enabled,
+                whatsapp_phone_number_id=whatsapp_phone_number_id,
+                whatsapp_verify_token=whatsapp_verify_token,
+                whatsapp_access_token=whatsapp_access_token,
             )
             return HttpResponse(
                 "<div class='bg-green-50 border border-green-200 rounded-md "
