@@ -78,13 +78,16 @@
 
             <div class="flex justify-end space-x-3 pt-4 border-t">
                 {% if appointment.status == 'pending' %}
-                <button hx-post="{% url 'appointments_confirm' appointment.id %}"
-                        hx-target="#modal"
-                        hx-swap="afterend"
-                        hx-on::htmx:after-request="if(event.detail.successful) { document.getElementById('modal').remove(); document.getElementById('modal-backdrop').remove(); window.location.reload(); }"
-                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-                    Confirmar
-                </button>
+                <form hx-post="{% url 'appointments_confirm' appointment.id %}"
+                      hx-target="#modal"
+                      hx-swap="afterend"
+                      hx-on::htmx:after-request="if(event.detail.successful) { document.getElementById('modal').remove(); document.getElementById('modal-backdrop').remove(); window.location.reload(); }">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                        Confirmar
+                    </button>
+                </form>
                 {% endif %}
                 {% if appointment.status == 'pending' or appointment.status == 'confirmed' %}
                 <button hx-on:click="document.getElementById('cancel-form').classList.remove('hidden')"
