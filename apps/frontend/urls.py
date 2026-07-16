@@ -11,6 +11,8 @@ from .views import (
     LogoutView,
     ServiceCreateView,
     ServicesListView,
+    StaffCreateView,
+    StaffListView,
     UpcomingAppointmentsView,
 )
 
@@ -57,5 +59,15 @@ urlpatterns = [
         "services/create/",
         ServiceCreateView.as_view(),
         name="services_create",
+    ),
+    path(
+        "staff/",
+        StaffListView.as_view(),
+        name="staff_list",
+    ),
+    path(
+        "staff/create/",
+        StaffCreateView.as_view(),
+        name="staff_create",
     ),
 ]

@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -14,7 +14,10 @@ from apps.customers.services import create_customer
 from apps.services.models import Service
 from apps.services.services import create_service
 from apps.staff.models import Staff
+from apps.staff.services import create_staff
 from apps.subscriptions.models import Subscription
+
+User = get_user_model()
 
 
 class LoginView(View):
@@ -349,7 +352,93 @@ class ServiceCreateView(LoginRequiredMixin, View):
             )
         except Exception as e:
             return HttpResponse(
-                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
                 f"No se pudo crear el servicio. {e}"
-                f"</div>"
+                "</div>"
+            )
+
+
+class StaffListView(LoginRequiredMixin, View):
+    def get(self, request):
+        business = request.user.business
+        if not business:
+            return HttpResponse(
+                "<div class='p-6 text-center'>"
+                "<p class='text-red-600'>Error: No tenés un negocio asignado.</p>"
+                "</div>"
+            )
+        staff_members = Staff.objects.filter(business=business).prefetch_related(
+            "services", "user", "appointments"
+        )
+        return render(request, "pages/staff_list.html", {"staff_members": staff_members})
+
+
+class StaffCreateView(LoginRequiredMixin, View):
+    def get(self, request):
+        business = request.user.business
+        if not business:
+            return HttpResponse(
+                "<div class='p-6 text-center'>"
+                "<p class='text-red-600'>Error: No tenés un negocio asignado.</p>"
+                "</div>"
+            )
+
+        existing_staff_user_ids = Staff.objects.filter(
+            business=business
+        ).values_list("user_id", flat=True)
+
+        available_users = User.objects.filter(
+            business=business,
+            is_active=True,
+        ).exclude(id__in=existing_staff_user_ids)
+
+        services = Service.objects.filter(business=business, is_active=True)
+
+        return render(
+            request,
+            "partials/staff_form.html",
+            {
+                "available_users": available_users,
+                "services": services,
+            },
+        )
+
+    def post(self, request):
+        business = request.user.business
+        if not business:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                "Error: No tenés un negocio asignado."
+                "</div>"
+            )
+
+        user_id = request.POST.get("user_id")
+        service_ids = request.POST.getlist("service_ids")
+
+        if not user_id:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                "Error: Debés seleccionar un usuario."
+                "</div>"
+            )
+
+        try:
+            user = User.objects.get(id=user_id)
+            create_staff(
+                business=business,
+                user=user,
+                service_ids=service_ids if service_ids else None,
+            )
+            return HttpResponse(
+                "<script>"
+                "document.getElementById('modal').remove();"
+                "document.getElementById('modal-backdrop').remove();"
+                "window.location.reload();"
+                "</script>"
+            )
+        except Exception as e:
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"No se pudo crear el personal. {e}"
+                "</div>"
             )
