@@ -224,6 +224,13 @@ class AppointmentCreateView(LoginRequiredMixin, View):
         starts_at = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
         starts_at = timezone.make_aware(starts_at)
 
+        if starts_at <= timezone.now():
+            return HttpResponse(
+                "<div class='bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700'>"
+                "No podés crear turnos en horarios que ya pasaron."
+                "</div>"
+            )
+
         customer = Customer.objects.get(id=customer_id)
         service = Service.objects.get(id=service_id)
         staff = Staff.objects.get(id=staff_id)
@@ -260,7 +267,7 @@ class AppointmentCreateView(LoginRequiredMixin, View):
             else:
                 user_msg = f"No se pudo crear el turno. {error_msg}"
             return HttpResponse(
-                f"<div class='bg-red-50 border border-red-200 rounded-md p-3 text-sm text-red-700'>"
+                f"<div class='bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700'>"
                 f"{user_msg}"
                 f"</div>"
             )
@@ -322,6 +329,9 @@ class AvailableSlotsView(LoginRequiredMixin, View):
 
         available_times = []
 
+        now = timezone.now()
+        is_today = target_date == now.date()
+
         for slot in slots:
             slot_start = slot.start_time
             slot_end = slot.end_time
@@ -340,6 +350,9 @@ class AvailableSlotsView(LoginRequiredMixin, View):
                         break
 
                 if is_available:
+                    if is_today and current <= now:
+                        current += timedelta(minutes=30)
+                        continue
                     available_times.append(current.time())
 
                 current += timedelta(minutes=30)
@@ -460,6 +473,14 @@ class AppointmentUpdateView(LoginRequiredMixin, View):
             from datetime import datetime
             starts_at = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M")
             starts_at = timezone.make_aware(starts_at)
+
+            if starts_at <= timezone.now():
+                return HttpResponse(
+                    "<div class='bg-red-50 border border-red-200 rounded-xl "
+                    "p-4 text-sm text-red-700'>"
+                    "No podés reprogramar turnos a horarios que ya pasaron."
+                    "</div>"
+                )
 
             customer = Customer.objects.get(id=customer_id)
             service = Service.objects.get(id=service_id)
