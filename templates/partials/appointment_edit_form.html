@@ -30,10 +30,10 @@
             </div>
             <div>
                 <label for="service" class="block text-sm font-medium text-argen-700 mb-1.5">Servicio</label>
-                <select name="service_id" id="service" required
+                <select name="service_id" id="service_edit" required
                         class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all bg-white">
                     {% for service in services %}
-                    <option value="{{ service.id }}" {% if service.id == appointment.service.id %}selected{% endif %}>
+                    <option value="{{ service.id }}" data-duration="{{ service.duration_minutes }}" {% if service.id == appointment.service.id %}selected{% endif %}>
                         {{ service.name }} ({{ service.duration_minutes }} min)
                     </option>
                     {% endfor %}
@@ -41,28 +41,27 @@
             </div>
             <div>
                 <label for="staff" class="block text-sm font-medium text-argen-700 mb-1.5">Personal</label>
-                <select name="staff_id" id="staff" required
+                <select name="staff_id" id="staff_edit" required
                         class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all bg-white">
                     {% for staff in staff_members %}
-                    <option value="{{ staff.id }}" {% if staff.id == appointment.staff.id %}selected{% endif %}>
-                        {{ staff.user.get_full_name|default:staff.user.username }}
-                    </option>
+                    <option value="{{ staff.id }}">{{ staff.user.get_full_name|default:staff.user.username }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label for="date" class="block text-sm font-medium text-argen-700 mb-1.5">Fecha</label>
-                    <input type="date" name="date" id="date" required
-                           value="{{ appointment.starts_at|date:'Y-m-d' }}"
-                           class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
+            <div>
+                <label for="date_edit" class="block text-sm font-medium text-argen-700 mb-1.5">Fecha</label>
+                <input type="date" name="date" id="date_edit" required
+                       value="{{ appointment.starts_at|date:'Y-m-d' }}"
+                       min="{{ today }}"
+                       class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
+            </div>
+            <div id="time-slots-container-edit">
+                <label class="block text-sm font-medium text-argen-700 mb-1.5">Horario</label>
+                <div id="time-slots-message-edit" class="text-sm text-argen-500 py-2">
+                    Seleccioná una fecha para ver los horarios disponibles
                 </div>
-                <div>
-                    <label for="time" class="block text-sm font-medium text-argen-700 mb-1.5">Hora</label>
-                    <input type="time" name="time" id="time" required
-                           value="{{ appointment.starts_at|time:'H:i' }}"
-                           class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
-                </div>
+                <div id="time-slots-edit" class="grid grid-cols-4 gap-2 hidden"></div>
+                <input type="hidden" name="time" id="selected_time_edit" required value="{{ appointment.starts_at|time:'H:i' }}">
             </div>
             <div>
                 <label for="notes" class="block text-sm font-medium text-argen-700 mb-1.5">Notas</label>
@@ -82,3 +81,59 @@
         </form>
     </div>
 </div>
+
+<script>
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date_edit').min = today;
+
+    function selectTimeSlotEdit(time) {
+        document.querySelectorAll('#time-slots-edit .time-slot').forEach(btn => {
+            btn.classList.remove('bg-argen-500', 'text-white', 'border-argen-500');
+            btn.classList.add('border-argen-200', 'text-argen-700', 'hover:bg-argen-50');
+        });
+        const selectedBtn = document.querySelector(`#time-slots-edit .time-slot[onclick="selectTimeSlotEdit('${time}')"]`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('bg-argen-500', 'text-white', 'border-argen-500');
+            selectedBtn.classList.remove('border-argen-200', 'text-argen-700', 'hover:bg-argen-50');
+        }
+        document.getElementById('selected_time_edit').value = time;
+    }
+
+    document.getElementById('date_edit').addEventListener('change', function() {
+        const date = this.value;
+        const staffId = document.getElementById('staff_edit').value;
+        const serviceId = document.getElementById('service_edit').value;
+        const messageEl = document.getElementById('time-slots-message-edit');
+        const slotsEl = document.getElementById('time-slots-edit');
+
+        if (!date || !staffId || !serviceId) {
+            messageEl.textContent = 'Seleccioná fecha, servicio y personal para ver horarios disponibles';
+            slotsEl.classList.add('hidden');
+            return;
+        }
+
+        messageEl.textContent = 'Cargando horarios...';
+        slotsEl.classList.add('hidden');
+
+        const url = `/appointments/available-slots/?date=${date}&staff_id=${staffId}&service_id=${serviceId}`;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                slotsEl.innerHTML = html;
+                slotsEl.classList.remove('hidden');
+                messageEl.textContent = '';
+            })
+            .catch(err => {
+                messageEl.textContent = 'Error al cargar horarios';
+            });
+    });
+
+    document.getElementById('staff_edit').addEventListener('change', function() {
+        document.getElementById('date_edit').dispatchEvent(new Event('change'));
+    });
+
+    document.getElementById('service_edit').addEventListener('change', function() {
+        document.getElementById('date_edit').dispatchEvent(new Event('change'));
+    });
+</script>

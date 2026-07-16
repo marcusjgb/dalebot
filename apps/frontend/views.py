@@ -200,6 +200,7 @@ class AppointmentCreateView(LoginRequiredMixin, View):
         customers = Customer.objects.filter(business=business, is_active=True)
         services = Service.objects.filter(business=business, is_active=True)
         staff_members = Staff.objects.filter(business=business, is_active=True)
+        today = timezone.now().date().isoformat()
         return render(
             request,
             "partials/appointment_form.html",
@@ -207,6 +208,7 @@ class AppointmentCreateView(LoginRequiredMixin, View):
                 "customers": customers,
                 "services": services,
                 "staff_members": staff_members,
+                "today": today,
             },
         )
 
@@ -262,6 +264,109 @@ class AppointmentCreateView(LoginRequiredMixin, View):
                 f"{user_msg}"
                 f"</div>"
             )
+
+
+class AvailableSlotsView(LoginRequiredMixin, View):
+    def get(self, request):
+        from datetime import datetime, timedelta
+
+        business = request.user.business
+        date_str = request.GET.get("date")
+        staff_id = request.GET.get("staff_id")
+        service_id = request.GET.get("service_id")
+
+        if not date_str or not staff_id or not service_id:
+            return HttpResponse(
+                '<p class="text-argen-500 text-sm">'
+                'Seleccioná fecha, servicio y personal para ver horarios disponibles.'
+                '</p>'
+            )
+
+        try:
+            target_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return HttpResponse(
+                '<p class="text-red-500 text-sm">Fecha inválida.</p>'
+            )
+
+        if target_date < timezone.now().date():
+            return HttpResponse(
+                '<p class="text-red-500 text-sm">No podés seleccionar fechas pasadas.</p>'
+            )
+
+        try:
+            staff = Staff.objects.get(id=staff_id, business=business)
+            service = Service.objects.get(id=service_id, business=business)
+        except (Staff.DoesNotExist, Service.DoesNotExist):
+            return HttpResponse(
+                '<p class="text-red-500 text-sm">Personal o servicio no encontrado.</p>'
+            )
+
+        duration = service.duration_minutes
+        day_of_week = target_date.weekday()
+
+        from apps.availability.selectors import get_availability_slots_for_day
+
+        slots = get_availability_slots_for_day(business, day_of_week, staff)
+
+        existing_appointments = Appointment.objects.filter(
+            business=business,
+            staff=staff,
+            starts_at__date=target_date,
+            status__in=[AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED],
+        ).order_by("starts_at")
+
+        busy_slots = []
+        for apt in existing_appointments:
+            busy_slots.append((apt.starts_at.time(), apt.ends_at.time()))
+
+        available_times = []
+
+        for slot in slots:
+            slot_start = slot.start_time
+            slot_end = slot.end_time
+
+            current = datetime.combine(target_date, slot_start)
+            end_datetime = datetime.combine(target_date, slot_end)
+
+            while current + timedelta(minutes=duration) <= end_datetime:
+                slot_end_time = (current + timedelta(minutes=duration)).time()
+                slot_start_time = current.time()
+
+                is_available = True
+                for busy_start, busy_end in busy_slots:
+                    if not (slot_end_time <= busy_start or slot_start_time >= busy_end):
+                        is_available = False
+                        break
+
+                if is_available:
+                    available_times.append(current.time())
+
+                current += timedelta(minutes=30)
+
+        if not available_times:
+            return HttpResponse(
+                '<p class="text-argen-500 text-sm py-4 text-center">'
+                'No hay horarios disponibles para esta fecha.'
+                '</p>'
+            )
+
+        html = '<div class="grid grid-cols-4 gap-2">'
+        for t in available_times:
+            time_str = t.strftime("%H:%M")
+            html += f'''
+            <button type="button"
+                    onclick="selectTimeSlot('{time_str}')"
+                    class="time-slot px-3 py-2 text-sm font-medium rounded-xl
+                           border border-argen-200 text-argen-700
+                           hover:bg-argen-50 hover:border-argen-400 transition-all">
+                {time_str}
+            </button>
+            '''
+        html += '</div>'
+        html += '<input type="hidden" name="time" id="selected_time" required>'
+
+        return HttpResponse(html)
 
 
 class AppointmentCancelView(LoginRequiredMixin, View):
@@ -322,6 +427,7 @@ class AppointmentUpdateView(LoginRequiredMixin, View):
             customers = Customer.objects.filter(business=business, is_active=True)
             services = Service.objects.filter(business=business, is_active=True)
             staff_members = Staff.objects.filter(business=business, is_active=True)
+            today = timezone.now().date().isoformat()
             return render(
                 request,
                 "partials/appointment_edit_form.html",
@@ -330,6 +436,7 @@ class AppointmentUpdateView(LoginRequiredMixin, View):
                     "customers": customers,
                     "services": services,
                     "staff_members": staff_members,
+                    "today": today,
                 },
             )
         except Appointment.DoesNotExist:

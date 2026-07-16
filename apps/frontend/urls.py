@@ -7,6 +7,7 @@ from .views import (
     AppointmentDetailView,
     AppointmentsListView,
     AppointmentUpdateView,
+    AvailableSlotsView,
     BusinessSettingsView,
     ConversationDetailView,
     ConversationsListView,
@@ -60,6 +61,11 @@ urlpatterns = [
         "appointments/<uuid:appointment_id>/edit/",
         AppointmentUpdateView.as_view(),
         name="appointments_edit",
+    ),
+    path(
+        "appointments/available-slots/",
+        AvailableSlotsView.as_view(),
+        name="available_slots",
     ),
     path(
         "customers/",

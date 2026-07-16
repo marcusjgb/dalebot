@@ -45,7 +45,7 @@
                         class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all bg-white">
                     <option value="">Seleccionar servicio...</option>
                     {% for service in services %}
-                    <option value="{{ service.id }}">{{ service.name }} ({{ service.duration_minutes }} min)</option>
+                    <option value="{{ service.id }}" data-duration="{{ service.duration_minutes }}">{{ service.name }} ({{ service.duration_minutes }} min)</option>
                     {% empty %}
                     <option value="" disabled>No hay servicios</option>
                     {% endfor %}
@@ -63,17 +63,19 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label for="date" class="block text-sm font-medium text-argen-700 mb-1.5">Fecha</label>
-                    <input type="date" name="date" id="date" required
-                           class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
+            <div>
+                <label for="date" class="block text-sm font-medium text-argen-700 mb-1.5">Fecha</label>
+                <input type="date" name="date" id="date" required
+                       min="{{ today }}"
+                       class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
+            </div>
+            <div id="time-slots-container">
+                <label class="block text-sm font-medium text-argen-700 mb-1.5">Horario</label>
+                <div id="time-slots-message" class="text-sm text-argen-500 py-2">
+                    Seleccioná una fecha para ver los horarios disponibles
                 </div>
-                <div>
-                    <label for="time" class="block text-sm font-medium text-argen-700 mb-1.5">Hora</label>
-                    <input type="time" name="time" id="time" required
-                           class="w-full border border-argen-200 rounded-xl py-2.5 px-3 text-argen-800 focus:outline-none focus:ring-2 focus:ring-argen-500 focus:border-argen-500 transition-all">
-                </div>
+                <div id="time-slots" class="grid grid-cols-4 gap-2 hidden"></div>
+                <input type="hidden" name="time" id="selected_time" required>
             </div>
             <div id="modal-result"></div>
             <div class="flex justify-end gap-3 pt-4">
@@ -89,3 +91,59 @@
         </form>
     </div>
 </div>
+
+<script>
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').min = today;
+
+    function selectTimeSlot(time) {
+        document.querySelectorAll('.time-slot').forEach(btn => {
+            btn.classList.remove('bg-argen-500', 'text-white', 'border-argen-500');
+            btn.classList.add('border-argen-200', 'text-argen-700', 'hover:bg-argen-50');
+        });
+        const selectedBtn = document.querySelector(`.time-slot[onclick="selectTimeSlot('${time}')"]`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('bg-argen-500', 'text-white', 'border-argen-500');
+            selectedBtn.classList.remove('border-argen-200', 'text-argen-700', 'hover:bg-argen-50');
+        }
+        document.getElementById('selected_time').value = time;
+    }
+
+    document.getElementById('date').addEventListener('change', function() {
+        const date = this.value;
+        const staffId = document.getElementById('staff').value;
+        const serviceId = document.getElementById('service').value;
+        const messageEl = document.getElementById('time-slots-message');
+        const slotsEl = document.getElementById('time-slots');
+
+        if (!date || !staffId || !serviceId) {
+            messageEl.textContent = 'Seleccioná fecha, servicio y personal para ver horarios disponibles';
+            slotsEl.classList.add('hidden');
+            return;
+        }
+
+        messageEl.textContent = 'Cargando horarios...';
+        slotsEl.classList.add('hidden');
+
+        const url = `/appointments/available-slots/?date=${date}&staff_id=${staffId}&service_id=${serviceId}`;
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                slotsEl.innerHTML = html;
+                slotsEl.classList.remove('hidden');
+                messageEl.textContent = '';
+            })
+            .catch(err => {
+                messageEl.textContent = 'Error al cargar horarios';
+            });
+    });
+
+    document.getElementById('staff').addEventListener('change', function() {
+        document.getElementById('date').dispatchEvent(new Event('change'));
+    });
+
+    document.getElementById('service').addEventListener('change', function() {
+        document.getElementById('date').dispatchEvent(new Event('change'));
+    });
+</script>
