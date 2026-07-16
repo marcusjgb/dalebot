@@ -146,10 +146,30 @@ class UpcomingAppointmentsView(LoginRequiredMixin, View):
 class AppointmentsListView(LoginRequiredMixin, View):
     def get(self, request):
         business = request.user.business
-        appointments = Appointment.objects.filter(
-            business=business
-        ).select_related("customer", "service", "staff").order_by("-starts_at")[:50]
-        return render(request, "pages/appointments_list.html", {"appointments": appointments})
+        status = request.GET.get("status", "")
+
+        appointments = Appointment.objects.filter(business=business)
+
+        if status:
+            appointments = appointments.filter(status=status)
+
+        appointments = appointments.select_related(
+            "customer", "service", "staff"
+        ).order_by("-starts_at")[:50]
+
+        if request.headers.get("HX-Request"):
+            return render(
+                request,
+                "partials/appointments_table.html",
+                {"appointments": appointments},
+            )
+
+        return render(
+            request,
+            "pages/appointments_list.html",
+            {"appointments": appointments, "current_status": status},
+        )
+
 
 
 class AppointmentCreateView(LoginRequiredMixin, View):

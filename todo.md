@@ -26,7 +26,7 @@
 - [x] Coverage configurado
 
 ### CI/CD
-- [x] GitHub Actions workflow (lint, typecheck, test)
+- [x] GitHub Actions workflow (lint, test)
 - [x] Ruff linting passing (0 errors)
 - [x] Docker Compose para desarrollo local
 
@@ -34,11 +34,12 @@
 - [x] Base template con Tailwind CSS + HTMX
 - [x] Login/Logout con Django auth
 - [x] Dashboard con stats
-- [x] Página de Turnos (Lista + Crear + Cancelar)
+- [x] Página de Turnos (Lista + Crear + Cancelar + Detalle + Editar + Confirmar)
 - [x] Página de Clientes (Lista + Crear)
 - [x] Página de Servicios (Lista + Crear)
+- [x] Página de Staff (Lista + Crear usuario + staff juntos)
 - [x] Mensajes de error amigables en español
-- [x] Nav menu: Dashboard | Turnos | Clientes | Servicios | Admin
+- [x] Nav menu: Dashboard | Turnos | Clientes | Servicios | Personal | Admin
 
 ### Commits
 ```
@@ -50,6 +51,12 @@
 - fix(frontend): improve appointment form error handling and modal
 - fix(frontend): improve user-friendly error messages in Spanish
 - feat(frontend): add Customers and Services pages with HTMX
+- feat(frontend): allow creating new users from Staff page
+- feat(appointments): add appointment detail modal
+- fix(appointments): modal close behavior on confirm/cancel
+- fix(appointments): add csrf token to confirm button
+- fix(appointments): correct htmx event syntax and swap strategy
+- feat(appointments): add edit appointment functionality
 ```
 
 ---
@@ -57,9 +64,9 @@
 ## 🔄 Por Hacer
 
 ### Frontend
-- [x] Página de Staff (listar, crear)
-- [ ] Detalle de Turno (ver info completa)
-- [ ] Confirmar turno (cambiar estado)
+- [x] Detalle de Turno (ver info completa)
+- [x] Confirmar turno (cambiar estado)
+- [x] Editar Turno (modificar datos)
 - [ ] Filtros funcionales en lista de turnos (pendientes, confirmados)
 - [ ] Página de Configuración del negocio
 
@@ -135,4 +142,4 @@ dalebot/
 
 ## 🏃 Próximo Paso Recomendado
 
-Detalle de **Turno** o **Confirmar turno** para completar la gestión de turnos.
+Filtros en lista de turnos (pendientes/confirmados/completados) para facilitar la gestión diaria.
