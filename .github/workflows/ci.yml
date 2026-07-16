@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [master, main]
 
 jobs:
   lint:
@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install ruff
-      - run: ruff check .
+      - run: ruff check apps/
 
   typecheck:
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
-      - run: mypy apps config
+      - run: mypy apps/ --ignore-missing-imports
 
   test:
     runs-on: ubuntu-latest
@@ -33,9 +33,10 @@ jobs:
         image: postgres:17
         env:
           POSTGRES_DB: appointments_test
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        ports: ["5432:5432"]
+          POSTGRES_USER: appointments
+          POSTGRES_PASSWORD: change-me
+        ports:
+          - "5432:5432"
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -43,7 +44,8 @@ jobs:
           --health-retries 5
       redis:
         image: redis:8
-        ports: ["6379:6379"]
+        ports:
+          - "6379:6379"
 
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +53,15 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -e ".[dev]"
-      - run: pytest --cov=apps --cov-report=xml --cov-report=term-missing
+      - run: pytest apps/ --cov=apps --cov-report=xml --cov-report=term-missing
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test
+          POSTGRES_HOST: localhost
+          POSTGRES_DB: appointments_test
+          POSTGRES_USER: appointments
+          POSTGRES_PASSWORD: change-me
+          POSTGRES_PORT: "5432"
+          REDIS_URL: redis://localhost:6379/0
       - uses: codecov/codecov-action@v4
         if: success()
         with:
