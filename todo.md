@@ -49,6 +49,7 @@
 - fix: all URL namespaces corrected, nav links working
 - fix(frontend): improve appointment form error handling and modal
 - fix(frontend): improve user-friendly error messages in Spanish
+- feat(frontend): add Customers and Services pages with HTMX
 ```
 
 ---
@@ -56,8 +57,6 @@
 ## 🔄 Por Hacer
 
 ### Frontend
-- [x] Página de Clientes (listar, crear)
-- [x] Página de Servicios (listar, crear)
 - [ ] Página de Staff (listar, crear)
 - [ ] Detalle de Turno (ver info completa)
 - [ ] Confirmar turno (cambiar estado)
@@ -127,10 +126,12 @@ dalebot/
 - **Admin:** http://localhost:8000/admin/
 - **Dashboard:** http://localhost:8000/dashboard/
 - **Turnos:** http://localhost:8000/appointments/
+- **Clientes:** http://localhost:8000/customers/
+- **Servicios:** http://localhost:8000/services/
 - **Repo:** https://github.com/marcusjgb/dalebot
 
 ---
 
 ## 🏃 Próximo Paso Recomendado
 
-Página de **Clientes** o **Servicios** para tener CRUD completo de los datos del negocio.
+Página de **Staff** para completar el CRUD básico del negocio.
