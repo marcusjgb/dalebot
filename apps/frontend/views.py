@@ -331,13 +331,16 @@ class AvailableSlotsView(LoginRequiredMixin, View):
 
         now = timezone.now()
         is_today = target_date == now.date()
+        tz = timezone.get_current_timezone()
 
         for slot in slots:
             slot_start = slot.start_time
             slot_end = slot.end_time
 
             current = datetime.combine(target_date, slot_start)
+            current = timezone.make_aware(current, tz)
             end_datetime = datetime.combine(target_date, slot_end)
+            end_datetime = timezone.make_aware(end_datetime, tz)
 
             while current + timedelta(minutes=duration) <= end_datetime:
                 slot_end_time = (current + timedelta(minutes=duration)).time()
